@@ -1,0 +1,15 @@
+# dependencies
+node_modules
+
+# production
+dist
+
+# Environment variables
+.env
+
+# TypeScript cache
+*.tsbuildinfo
+
+# IDE specific files
+.vscode/
+.idea/
