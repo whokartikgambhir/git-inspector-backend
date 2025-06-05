@@ -21,6 +21,7 @@
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
     "eslint": "^8.56.0",
+    "husky": "^9.1.7",
     "mocha": "^10.2.0",
     "nodemon": "^3.1.10",
     "nyc": "^15.1.0",
@@ -39,6 +40,7 @@
     "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.test.ts",
     "coverage": "nyc npm test",
     "clean": "shx rm -rf node_modules yarn.lock",
-    "reinstall": "yarn clean && yarn install"
+    "reinstall": "yarn clean && yarn install",
+    "prepare": "husky install"
   }
 }
