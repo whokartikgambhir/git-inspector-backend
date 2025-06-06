@@ -6,6 +6,6 @@ import { getOpenPRsController } from "../controllers/prController";
 
 const router = express.Router();
 
-router.get("/prs/open", getOpenPRsController);
+router.get("/prs/:username/open", getOpenPRsController);
 
 export default router;
