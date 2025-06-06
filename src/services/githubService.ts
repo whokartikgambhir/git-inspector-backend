@@ -59,8 +59,8 @@ export const fetchOpenPullRequestsForAllRepos = async (owner: string) => {
   }
 };
 
-export const fetchAllPullRequestsForUser = async (username: string) => {
-  const { data: repos } = await githubClient.get(`/users/${username}/repos`);
+export const fetchAllPullRequestsForUser = async (userName: string) => {
+  const { data: repos } = await githubClient.get(`/users/${userName}/repos`);
 
   const allPRs = await Promise.all(
     repos.map(async (repo: any) => {

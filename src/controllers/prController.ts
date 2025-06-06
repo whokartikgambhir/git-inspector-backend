@@ -12,13 +12,13 @@ export const getOpenPRsController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { username } = req.params;
+  const { developer } = req.params;
   const { repo } = req.query;
 
   try {
     const prs = repo
-      ? await fetchOpenPullRequests(username as string, repo as string)
-      : await fetchOpenPullRequestsForAllRepos(username as string);
+      ? await fetchOpenPullRequests(developer as string, repo as string)
+      : await fetchOpenPullRequestsForAllRepos(developer as string);
     res.json({ prs });
   } catch (error: any) {
     console.error("Controller error:", error);
@@ -30,10 +30,10 @@ export const getPRTimingMetricsController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { username } = req.params;
+  const { developer } = req.params;
 
   try {
-    const allPRs = await fetchAllPullRequestsForUser(username);
+    const allPRs = await fetchAllPullRequestsForUser(developer);
     const now = new Date().getTime();
     const closedDurations: number[] = [];
 
@@ -69,7 +69,7 @@ export const getPRTimingMetricsController = async (
       : null;
 
     res.json({
-      developer: username,
+      developer: developer,
       avgCloseOrMergeTime,
       longestRunningOpenPRs
     });
