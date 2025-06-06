@@ -2,13 +2,21 @@
 import type { Request, Response } from "express";
 
 // internal dependencies
-import { fetchDeveloperPRStats } from "../services/devService";
+import { fetchDeveloperPRStats } from "../services/devService.js";
 
 export const getDeveloperAnalyticsController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { developer } = req.query;
+  const user = (req as any).user;
+
+   if (!user || !user.token) {
+    res.status(401).json({ error: "Unauthorized. No token found." });
+    return;
+  }
+
+  const token = user.token;
 
   if (!developer) {
     res.status(400).json({ message: "Missing developer username" });
@@ -16,7 +24,7 @@ export const getDeveloperAnalyticsController = async (
   }
 
   try {
-    const data = await fetchDeveloperPRStats(developer as string);
+    const data = await fetchDeveloperPRStats(developer as string, token);
 
     let open = 0;
     let closed = 0;

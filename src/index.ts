@@ -4,15 +4,17 @@ import express from "express";
 import mongoose from "mongoose";
 
 // internal dependencies
-import userRoutes from "./routes/userRoutes";
-import prRoutes from "./routes/prRoutes";
-import devRoutes from "./routes/devRoutes";
+import userRoutes from "./routes/userRoutes.js";
+import prRoutes from "./routes/prRoutes.js";
+import devRoutes from "./routes/devRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", prRoutes);
 app.use("/api", devRoutes);

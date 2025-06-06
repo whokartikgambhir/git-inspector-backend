@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from "express";
 
 // internal dependencies
-import User, { IUser } from "../models/user";
+import User, { IUser } from "../models/user.js";
 
 export const checkUserExists = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -13,7 +13,6 @@ export const checkUserExists = async (req: Request, res: Response, next: NextFun
     }
 
     const user = await User.findOne({ userName }) as IUser;
-    console.log("user from db", JSON.stringify(user, null, 2));
     if (!user) {
       res.status(403).json({ error: "Unauthorized GitHub username" });
       return;

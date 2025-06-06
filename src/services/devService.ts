@@ -1,9 +1,10 @@
 // internal dependencies
-import { githubClient } from "../utils/githubClient";
+import { githubClient } from "../utils/githubClient.js";
 
-export const fetchDeveloperPRStats = async (developer: string) => {
+export const fetchDeveloperPRStats = async (developer: string, token: string) => {
   try {
-    const { data } = await githubClient.get(`/search/issues`, {
+    const client = githubClient(token);
+    const { data } = await client.get(`/search/issues`, {
       params: {
         q: `type:pr author:${developer}`
       },
