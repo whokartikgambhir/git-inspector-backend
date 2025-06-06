@@ -41,25 +41,17 @@ export const getPRTimingMetricsController = async (
       .filter((pr) => pr.state === "open")
       .map((pr) => {
         const openDuration = now - new Date(pr.createdAt).getTime();
-        const hours = Math.floor(openDuration / (1000 * 60 * 60));
-        const minutes = Math.floor((openDuration % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((openDuration % (1000 * 60)) / 1000);
-
         return {
-        title: pr.title,
-        author: pr.author,
-        createdAt: pr.createdAt,
-        status: pr.state,
-        repo: pr.pr.split("/pull")[0],
-        pr: pr.pr,
-        openSince: `${hours} hr: ${minutes} min: ${seconds} sec`
+          title: pr.title,
+          author: pr.author,
+          createdAt: pr.createdAt,
+          status: pr.state,
+          repo: pr.pr.split("/pull")[0],
+          pr: pr.pr,
+          openSince: formatExtendedDuration(openDuration)
         };
       })
-      .sort((a, b) => {
-        const aTime = new Date(a.createdAt).getTime();
-        const bTime = new Date(b.createdAt).getTime();
-        return aTime - bTime;
-      })
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
       .slice(0, 5);
 
     for (const pr of allPRs) {
@@ -70,15 +62,8 @@ export const getPRTimingMetricsController = async (
       }
     }
 
-    const formatDuration = (ms: number) => {
-      const h = Math.floor(ms / (1000 * 60 * 60));
-      const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((ms % (1000 * 60)) / 1000);
-      return `${h} hr: ${m} min: ${s} sec`;
-    };
-
     const avgCloseOrMergeTime = closedDurations.length
-      ? formatDuration(
+      ? formatExtendedDuration(
           closedDurations.reduce((a, b) => a + b, 0) / closedDurations.length
         )
       : null;
@@ -92,4 +77,27 @@ export const getPRTimingMetricsController = async (
     console.error("PR Timing Metrics error:", error);
     res.status(500).json({ error: error.message });
   }
+};
+
+const formatExtendedDuration = (ms: number): string => {
+  const totalSeconds = Math.floor(ms / 1000);
+
+  const years = Math.floor(totalSeconds / (60 * 60 * 24 * 365));
+  const months = Math.floor((totalSeconds % (60 * 60 * 24 * 365)) / (60 * 60 * 24 * 30));
+  const weeks = Math.floor((totalSeconds % (60 * 60 * 24 * 30)) / (60 * 60 * 24 * 7));
+  const days = Math.floor((totalSeconds % (60 * 60 * 24 * 7)) / (60 * 60 * 24));
+  const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+  const seconds = totalSeconds % 60;
+
+  const parts = [];
+  if (years) parts.push(`${years} years`);
+  if (months) parts.push(`${months} months`);
+  if (weeks) parts.push(`${weeks} weeks`);
+  if (days) parts.push(`${days} days`);
+  if (hours) parts.push(`${hours} hrs`);
+  if (minutes) parts.push(`${minutes} mins`);
+  if (seconds) parts.push(`${seconds} secs`);
+
+  return parts.join(", ");
 };
