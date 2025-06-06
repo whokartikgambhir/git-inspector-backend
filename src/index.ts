@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 
 // internal dependencies
 import prRoutes from "./routes/prRoutes";
+import devRoutes from './routes/devRoutes';
 
 dotenv.config();
 const app = express();
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use("/api", prRoutes);
+app.use("/api", devRoutes);
 
 app.get('/health', (_, res) => {
   console.log('Health check endpoint hit');

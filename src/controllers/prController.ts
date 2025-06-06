@@ -2,21 +2,22 @@
 import type { Request, Response } from "express";
 
 // internal dependencies
-import { fetchOpenPullRequests } from "../services/githubService";
+import {
+  fetchOpenPullRequests,
+  fetchOpenPullRequestsForAllRepos,
+} from "../services/githubService";
 
 export const getOpenPRsController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { owner, repo } = req.query;
-
-  if (!owner || !repo) {
-    res.status(400).json({ message: "Missing owner or repo" });
-    return;
-  }
+  const { username } = req.params;
+  const { repo } = req.query;
 
   try {
-    const prs = await fetchOpenPullRequests(owner as string, repo as string);
+    const prs = repo
+      ? await fetchOpenPullRequests(username as string, repo as string)
+      : await fetchOpenPullRequestsForAllRepos(username as string);
     res.json({ prs });
   } catch (error: any) {
     console.error("Controller error:", error);
