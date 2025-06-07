@@ -1,9 +1,10 @@
 // internal dependencies
-import { githubClient } from "../utils/githubClient";
+import { githubClient } from "../utils/githubClient.js";
 
-export const fetchOpenPullRequests = async (owner: string, repo: string) => {
+export const fetchOpenPullRequests = async (owner: string, repo: string, token: string) => {
   try {
-    const { data } = await githubClient.get(`/repos/${owner}/${repo}/pulls`, {
+    const client = githubClient(token);
+    const { data } = await client.get(`/repos/${owner}/${repo}/pulls`, {
       params: {
         state: "open",
       },
@@ -23,14 +24,15 @@ export const fetchOpenPullRequests = async (owner: string, repo: string) => {
   }
 };
 
-export const fetchOpenPullRequestsForAllRepos = async (owner: string) => {
+export const fetchOpenPullRequestsForAllRepos = async (owner: string, token: string) => {
   try {
-    const { data: repos } = await githubClient.get(`/users/${owner}/repos`);
+    const client = githubClient(token);
+    const { data: repos } = await client.get(`/users/${owner}/repos`);
 
     const allPRs = await Promise.all(
       repos.map(async (repo: any) => {
         try {
-          const { data: prs } = await githubClient.get(
+          const { data: prs } = await client.get(
             `/repos/${owner}/${repo.name}/pulls`,
             {
               params: { state: "open" },
@@ -59,13 +61,14 @@ export const fetchOpenPullRequestsForAllRepos = async (owner: string) => {
   }
 };
 
-export const fetchAllPullRequestsForUser = async (userName: string) => {
-  const { data: repos } = await githubClient.get(`/users/${userName}/repos`);
+export const fetchAllPullRequestsForUser = async (userName: string, token: string) => {
+  const client = githubClient(token);
+  const { data: repos } = await client.get(`/users/${userName}/repos`);
 
   const allPRs = await Promise.all(
     repos.map(async (repo: any) => {
       try {
-        const { data: prs } = await githubClient.get(
+        const { data: prs } = await client.get(
           `/repos/${repo.owner.login}/${repo.name}/pulls`,
           {
             params: { state: "all" },

@@ -6,7 +6,7 @@ import {
   fetchOpenPullRequests,
   fetchOpenPullRequestsForAllRepos,
   fetchAllPullRequestsForUser
-} from "../services/githubService";
+} from "../services/githubService.js";
 
 export const getOpenPRsController = async (
   req: Request,
@@ -14,11 +14,19 @@ export const getOpenPRsController = async (
 ): Promise<void> => {
   const { developer } = req.params;
   const { repo } = req.query;
+  const user = (req as any).user;
+
+   if (!user || !user.token) {
+    res.status(401).json({ error: "Unauthorized. No token found." });
+    return;
+  }
+
+  const token = user.token;
 
   try {
     const prs = repo
-      ? await fetchOpenPullRequests(developer as string, repo as string)
-      : await fetchOpenPullRequestsForAllRepos(developer as string);
+      ? await fetchOpenPullRequests(developer as string, repo as string, token)
+      : await fetchOpenPullRequestsForAllRepos(developer as string, token);
     res.json({ prs });
   } catch (error: any) {
     console.error("Controller error:", error);
@@ -31,9 +39,17 @@ export const getPRTimingMetricsController = async (
   res: Response
 ): Promise<void> => {
   const { developer } = req.params;
+   const user = (req as any).user;
+
+   if (!user || !user.token) {
+    res.status(401).json({ error: "Unauthorized. No token found." });
+    return;
+  }
+
+  const token = user.token;
 
   try {
-    const allPRs = await fetchAllPullRequestsForUser(developer);
+    const allPRs = await fetchAllPullRequestsForUser(developer, token);
     const now = new Date().getTime();
     const closedDurations: number[] = [];
 
