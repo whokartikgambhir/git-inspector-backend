@@ -10,6 +10,7 @@ import {
   GITHUB_STATES,
   DEFAULT_PAGINATION,
 } from "../common/constants.js";
+import logger from "../utils/logger.js";
 
 /**
  * Controller to provide analytics for a developer's pull requests
@@ -104,8 +105,6 @@ export const getDeveloperAnalyticsController = async (
 
     res.status(STATUS_CODES.OK).json({
       developer,
-      page: pageNum,
-      limit: limitNum,
       totalPRs: data.total_count,
       openPRs: open,
       closedPRs: closed,
@@ -116,7 +115,7 @@ export const getDeveloperAnalyticsController = async (
     });
   } catch (error) {
     const err = error as APIError;
-    console.error("Developer analytics error:", err.message);
+    logger.error("Developer analytics error:", err.message);
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message });
   }
 };

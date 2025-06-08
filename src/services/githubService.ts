@@ -1,4 +1,5 @@
 // internal dependencies
+import logger from "../utils/logger.js";
 import { GITHUB_STATES } from "../common/constants.js";
 import { githubClient } from "../utils/githubClient.js";
 import { APIError, GitHubPR, GitHubRepo, MappedPR } from "../common/types.js";
@@ -47,7 +48,7 @@ export const fetchOpenPullRequests = async (
     return data.map((pr) => mapPR(pr, repo));
   } catch (error) {
     const err = error as APIError;
-    console.error(`GitHub API error (repo-specific):`, err);
+    logger.error(`GitHub API error (repo-specific):`, err);
     throw new Error(err?.message || "GitHub API call failed");
   }
 };
@@ -85,7 +86,7 @@ export const fetchOpenPullRequestsForAllRepos = async (
       .flatMap((result) => result.value);
   } catch (error) {
     const err = error as APIError;
-    console.error(`GitHub API error (owner-level):`, err.message);
+    logger.error(`GitHub API error (owner-level):`, err.message);
     throw new Error(err.message || "Failed to fetch repos or PRs");
   }
 };

@@ -1,4 +1,5 @@
 // external dependencies
+import 'reflect-metadata';
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
@@ -11,6 +12,7 @@ import {
   MESSAGES,
   STATUS_CODES,
 } from "./common/constants.js";
+import logger from './utils/logger.js';
 import prRoutes from "./routes/prRoutes.js";
 import { APIError } from "./common/types.js";
 import devRoutes from "./routes/devRoutes.js";
@@ -64,7 +66,7 @@ app.get(API_ENDPOINTS.HEALTH_CHECK, async (_, res) => {
     });
   } catch (error) {
     const err = error as APIError;
-    console.error("Health check failed:", err.message);
+    logger.error("Health check failed:", err.message);
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       status: MESSAGES.INTERNAL_SERVER_ERROR,
       error: err.message,
@@ -76,9 +78,9 @@ app.get(API_ENDPOINTS.HEALTH_CHECK, async (_, res) => {
 mongoose
   .connect(process.env.MONGO_URI || "", {})
   .then(() => {
-    console.log("MongoDB connected");
+    logger.info("MongoDB connected");
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((err) => {
-    console.error("MongoDB connection error:", err);
+    logger.error("MongoDB connection error:", err);
   });

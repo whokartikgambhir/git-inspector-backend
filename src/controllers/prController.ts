@@ -9,6 +9,7 @@ import {
 } from "../services/githubService.js";
 import { APIError, AuthenticatedRequest } from "../common/types.js";
 import { STATUS_CODES, MESSAGES, GITHUB_STATES, DEFAULT_PAGINATION } from "../common/constants.js";
+import logger from "../utils/logger.js";
 
 /**
  * Helper function to paginate an array of items
@@ -58,7 +59,7 @@ export const getOpenPRsController = async (
     res.status(STATUS_CODES.OK).json({ prs: paginatedPRs, total: allPRs.length });
   } catch (error) {
     const err = error as APIError;
-    console.error("Controller error:", err.message);
+    logger.error("Controller error:", err.message);
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message || MESSAGES.INTERNAL_SERVER_ERROR });
   }
 };
@@ -128,7 +129,7 @@ export const getPRTimingMetricsController = async (
     });
   } catch (error) {
     const err = error as APIError;
-    console.error("PR Timing Metrics error:", err);
+    logger.error("PR Timing Metrics error:", err);
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message || MESSAGES.INTERNAL_SERVER_ERROR });
   }
 };

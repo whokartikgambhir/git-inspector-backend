@@ -5,6 +5,7 @@ import { Response, NextFunction } from "express";
 // internal dependencies
 import { STATUS_CODES, MESSAGES } from "../common/constants.js";
 import { APIError, AuthenticatedRequest } from "../common/types.js";
+import logger from "../utils/logger.js";
 
 /**
  * Middleware to authenticate requests using GitHub Personal Access Token (PAT)
@@ -45,7 +46,7 @@ export const authenticateWithPAT = async (
     next();
   } catch (error) {
     const err = error as APIError;
-    console.error("GitHub PAT authentication failed:", err.message);
+    logger.error("GitHub PAT authentication failed:", err.message);
     res.status(STATUS_CODES.UNAUTHORIZED).json({ error: MESSAGES.INVALID_TOKEN });
   }
 };

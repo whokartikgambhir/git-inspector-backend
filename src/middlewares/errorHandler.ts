@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 // internal dependencies
 import { MESSAGES, STATUS_CODES } from '../common/constants.js';
 import { APIError } from '../common/types.js';
+import logger from '../utils/logger.js';
 
 /**
  * Express error handling middleware
@@ -20,7 +21,7 @@ export const errorHandler = (
   res: Response
 ): void => {
   // logs error with a timestamp and stack trace if available
-  console.error(`[${new Date().toISOString()}] Error:`, err.stack || err);
+  logger.error(`[${new Date().toISOString()}] Error:`, err.stack || err);
 
   const status = err.status || STATUS_CODES.INTERNAL_SERVER_ERROR;
   const message = err.message || MESSAGES.INTERNAL_SERVER_ERROR;

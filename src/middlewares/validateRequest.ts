@@ -1,29 +1,56 @@
 // external dependencies
-import { validate } from 'class-validator';
-import { Response, NextFunction } from 'express';
 import { plainToInstance } from 'class-transformer';
+import { validate, ValidatorOptions } from 'class-validator';
+import { RequestHandler, Response, NextFunction } from 'express';
 
 // internal dependencies
 import { STATUS_CODES } from '../common/constants.js';
 import { ClassType, ValidatedRequest } from '../common/types.js';
 
 /**
- * Middleware to validate request body against a DTO class
+ * Middleware to sanitize and validate request data against a DTO class
+ * Sanitizes req.body, req.query, and req.params by trimming and removing dangerous characters,
+ * then validates against the provided DTO, attaching the validated object to req.validatedBody
  * Attaches the validated DTO to req.validatedBody if valid
- * 
- * @param dtoClass - The class type of the DTO to validate against
- * @template T - The type of the DTO class
+ *
+ * @param dtoClass - DTO class to validate against
+ * @param options - class-validator options (whitelist, transform, etc.)
  * @returns A middleware function that validates the request body
  */
-export const validateRequest = <T extends object>(dtoClass: ClassType<T>) => {
-  return async (req: ValidatedRequest<T>, res: Response, next: NextFunction): Promise<void> => {
-    // convert plain request body to an instance of the DTO class
-    const dtoObj = plainToInstance(dtoClass, req.body);
-    // validate DTO instance using class-validator
-    const errors = await validate(dtoObj);
+export const validateRequest = <T extends object>(
+  dtoClass: ClassType<T>,
+  options: ValidatorOptions = { whitelist: true }
+): RequestHandler => {
+  return async (
+    req: ValidatedRequest<T>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    // Sanitization: trim and remove potentially dangerous chars
+    const sanitize = (obj?: Record<string, string>) => {
+      if (!obj || typeof obj !== 'object') return;
+      for (const key of Object.keys(obj)) {
+        const val = obj[key];
+        if (typeof val === 'string') {
+          let sanitized = val.trim();
+          // remove < > " ' ` ; ( ) \ characters
+          sanitized = sanitized.replace(/[<>"'`;()\\]/g, '');
+          obj[key] = sanitized;
+        }
+      }
+    };
+    sanitize(req.body);
+    sanitize(req.query as Record<string, string>);
+    sanitize(req.params as Record<string, string>);
 
+    // Validation
+    const dtoObj = plainToInstance(dtoClass, {
+      ...req.params,
+      ...req.query,
+      ...req.body,
+    });
+    const errors = await validate(dtoObj, options);
     if (errors.length > 0) {
-      // flatten all constraint messages for a readable error response
       const messages = errors
         .flatMap(err => Object.values(err.constraints || {}))
         .join('; ');
@@ -31,7 +58,7 @@ export const validateRequest = <T extends object>(dtoClass: ClassType<T>) => {
       return;
     }
 
-    // optionally attach validated DTO to request for controller use
+    // Attach the validated and sanitized DTO
     req.validatedBody = dtoObj;
 
     next();

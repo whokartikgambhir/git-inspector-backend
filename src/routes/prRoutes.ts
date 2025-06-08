@@ -5,7 +5,12 @@ import express, { Router } from "express";
 import { API_ENDPOINTS } from "../common/constants.js";
 import { checkUserExists } from "../middlewares/validateUser.js";
 import { authenticateWithPAT } from "../middlewares/authMiddleware.js";
-import { getOpenPRsController, getPRTimingMetricsController } from "../controllers/prController.js";
+import {
+  getOpenPRsController,
+  getPRTimingMetricsController,
+} from "../controllers/prController.js";
+import { GetPrsDto, GetMetricsDto } from "../common/dtos/pr.dto.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
 
 const router: Router = express.Router();
 
@@ -14,6 +19,7 @@ const router: Router = express.Router();
 router.get(
   API_ENDPOINTS.PRS.OPEN,
   authenticateWithPAT,
+  validateRequest(GetPrsDto),
   checkUserExists,
   getOpenPRsController
 );
@@ -23,6 +29,7 @@ router.get(
 router.get(
   API_ENDPOINTS.PRS.METRICS,
   authenticateWithPAT,
+  validateRequest(GetMetricsDto),
   checkUserExists,
   getPRTimingMetricsController
 );

@@ -18,29 +18,20 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const { userName, email } = req.body;
-
-      if (!userName) {
-        res
-          .status(STATUS_CODES.BAD_REQUEST)
-          .json({ error: "username is required" });
-        return;
-      }
-
+      
       const existing = await User.findOne({ userName });
       if (existing) {
         res.status(STATUS_CODES.CONFLICT).json({ error: MESSAGES.USER_EXISTS });
         return;
       }
 
-      const user = await User.create({ userName, email });
+      const user = (await User.create({ userName, email })) as IUser;
       res
         .status(STATUS_CODES.CREATED)
         .json({ message: MESSAGES.USER_CREATED, user });
     } catch (error) {
       const err = error as APIError;
-      res
-        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-        .json({ error: err.message });
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message });
     }
   }
 );
@@ -51,9 +42,7 @@ router.get(API_ENDPOINTS.USER, async (req: Request, res: Response) => {
   try {
     const users = (await User.find()) as IUser[];
     if (users.length === 0) {
-      res
-        .status(STATUS_CODES.NOT_FOUND)
-        .json({ error: MESSAGES.USER_NOT_FOUND });
+      res.status(STATUS_CODES.NOT_FOUND).json({ error: MESSAGES.USER_NOT_FOUND });
       return;
     }
     res.status(STATUS_CODES.OK).json(users);
