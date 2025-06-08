@@ -1,5 +1,5 @@
 // external dependencies
-import type { Request, Response } from "express";
+import type { Response } from "express";
 
 // internal dependencies
 import {
@@ -7,42 +7,79 @@ import {
   fetchOpenPullRequestsForAllRepos,
   fetchAllPullRequestsForUser
 } from "../services/githubService.js";
+import { APIError, AuthenticatedRequest } from "../common/types.js";
+import { STATUS_CODES, MESSAGES, GITHUB_STATES, DEFAULT_PAGINATION } from "../common/constants.js";
 
+/**
+ * Helper function to paginate an array of items
+ * 
+ * @param items - array of items to paginate
+ * @param page - current page number
+ * @param limit - number of items per page
+ * @returns paginated array of items
+ */
+const paginate = <T>(items: T[], page: number, limit: number): T[] => {
+  const start = (page - 1) * limit;
+  return items.slice(start, start + limit);
+};
+
+/**
+ * GET /prs/:developer/open - Get open PRs for a developer
+ * Controller to get open pull requests for a developer
+ * 
+ * @param req - AuthenticatedRequest request object
+ * @param res - express response object
+ * @returns promise that resolves to void
+ */
 export const getOpenPRsController = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   const { developer } = req.params;
-  const { repo } = req.query;
-  const user = (req as any).user;
+  const { repo, page = DEFAULT_PAGINATION.PAGE, limit = DEFAULT_PAGINATION.LIMIT } = req.query;
+  const user = req.user;
 
-   if (!user || !user.token) {
-    res.status(401).json({ error: "Unauthorized. No token found." });
+  if (!user || !user.token) {
+    res.status(STATUS_CODES.UNAUTHORIZED).json({ error: MESSAGES.UNAUTHORIZED_USER });
     return;
   }
 
   const token = user.token;
+  const pageNum = Math.max(1, parseInt(page as string) || DEFAULT_PAGINATION.PAGE);
+  const limitNum = Math.max(1, parseInt(limit as string) || DEFAULT_PAGINATION.LIMIT);
 
   try {
-    const prs = repo
+    const allPRs = repo
       ? await fetchOpenPullRequests(developer as string, repo as string, token)
       : await fetchOpenPullRequestsForAllRepos(developer as string, token);
-    res.json({ prs });
-  } catch (error: any) {
-    console.error("Controller error:", error);
-    res.status(500).json({ error: error?.message || "Something went wrong" });
+
+    const paginatedPRs = paginate(allPRs, pageNum, limitNum);
+
+    res.status(STATUS_CODES.OK).json({ prs: paginatedPRs, total: allPRs.length });
+  } catch (error) {
+    const err = error as APIError;
+    console.error("Controller error:", err.message);
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message || MESSAGES.INTERNAL_SERVER_ERROR });
   }
 };
 
+/**
+ * GET /prs/metrics/:developer - Get PR timing metrics for a developer
+ * Controller to get PR timing metrics for a developer
+ *
+ * @param req - AuthenticatedRequest request object
+ * @param res - express response object
+ * @returns promise that resolves to void
+ */
 export const getPRTimingMetricsController = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   const { developer } = req.params;
-   const user = (req as any).user;
+  const user = req.user;
 
-   if (!user || !user.token) {
-    res.status(401).json({ error: "Unauthorized. No token found." });
+  if (!user || !user.token) {
+    res.status(STATUS_CODES.UNAUTHORIZED).json({ error: MESSAGES.UNAUTHORIZED_USER });
     return;
   }
 
@@ -54,7 +91,7 @@ export const getPRTimingMetricsController = async (
     const closedDurations: number[] = [];
 
     const longestRunningOpenPRs = allPRs
-      .filter((pr) => pr.state === "open")
+      .filter((pr) => pr.state === GITHUB_STATES.OPEN)
       .map((pr) => {
         const openDuration = now - new Date(pr.createdAt).getTime();
         return {
@@ -72,7 +109,7 @@ export const getPRTimingMetricsController = async (
 
     for (const pr of allPRs) {
       const created = new Date(pr.createdAt).getTime();
-      if (pr.state !== "open" && pr.closedAt) {
+      if (pr.state !== GITHUB_STATES.OPEN && pr.closedAt) {
         const closed = new Date(pr.closedAt).getTime();
         closedDurations.push(closed - created);
       }
@@ -84,19 +121,27 @@ export const getPRTimingMetricsController = async (
         )
       : null;
 
-    res.json({
-      developer: developer,
+    res.status(STATUS_CODES.OK).json({
+      developer,
       avgCloseOrMergeTime,
-      longestRunningOpenPRs
+      longestRunningOpenPRs,
     });
-  } catch (error: any) {
-    console.error("PR Timing Metrics error:", error);
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    const err = error as APIError;
+    console.error("PR Timing Metrics error:", err);
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message || MESSAGES.INTERNAL_SERVER_ERROR });
   }
 };
 
+/**
+ * Helper Function to format a duration of milliseconds into a human-readable string
+ *
+ * @param ms - duration in milliseconds
+ * @returns human-readable string representation of the duration
+ */
 const formatExtendedDuration = (ms: number): string => {
   const totalSeconds = Math.floor(ms / 1000);
+  if (totalSeconds < 60) return `${totalSeconds} secs`;
 
   const years = Math.floor(totalSeconds / (60 * 60 * 24 * 365));
   const months = Math.floor((totalSeconds % (60 * 60 * 24 * 365)) / (60 * 60 * 24 * 30));

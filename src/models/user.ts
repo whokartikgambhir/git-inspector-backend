@@ -1,24 +1,30 @@
 // external dependencies
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface IUser {
+// mongoose document interface for a User
+export interface IUser extends Document {
   userName: string;
   email?: string;
 }
 
-const userSchema: Schema = new mongoose.Schema<IUser>(
+// user schema
+const userSchema: Schema<IUser> = new Schema<IUser>(
   {
     userName: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
     email: {
       type: String,
-      required: false
-    }
+      required: false,
+      trim: true,
+      lowercase: true,
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model<IUser>("User", userSchema);
+const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
+export default User;
