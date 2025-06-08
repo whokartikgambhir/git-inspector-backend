@@ -4,21 +4,28 @@ import type { Request, Response } from "express";
 
 // internal dependencies
 import User from "../models/user.js";
+import logger from "../utils/logger.js";
+import { encrypt } from "../utils/crypto.js";
 import { APIError } from "../common/types.js";
 import { STATUS_CODES, MESSAGES } from "../common/constants.js";
 
 /**
- * Validates the GitHub Personal Access Token (PAT) provided in the request
- * 
+ * Validates the GitHub Personal Access Token (PAT), encrypts it and stores on user record
+ *
  * @param req - express request object
  * @param res - express response object
  * @returns promise that resolves void
  */
-export const validateGitHubPAT = async (req: Request, res: Response): Promise<void> => {
+export const validateGitHubPAT = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { pat } = req.body;
 
   if (!pat) {
-    res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.MISSING_TOKEN });
+    res
+      .status(STATUS_CODES.BAD_REQUEST)
+      .json({ error: MESSAGES.MISSING_TOKEN });
     return;
   }
 
@@ -30,14 +37,17 @@ export const validateGitHubPAT = async (req: Request, res: Response): Promise<vo
     const userName = userData.login;
     const email = userData.email || undefined;
 
-    // check if user already exists in the database
-    let user = await User.findOne({ userName });
+    // encrypt the PAT
+    const encrypted = encrypt(pat);
 
-    // if not, create a new user
-    if (!user) {
-      user = await User.create({ userName, email });
-    }
+    // upsert the user, storing the encrypted PAT
+    const user = await User.findOneAndUpdate(
+      { userName },
+      { email, encryptedPat: encrypted },
+      { new: true, upsert: true }
+    );
 
+    logger.info(`{ user: ${userData.login} }, PAT validated successfully`);
     res.status(STATUS_CODES.OK).json({
       message: MESSAGES.AUTH_SUCCESS,
       user: {
@@ -47,7 +57,9 @@ export const validateGitHubPAT = async (req: Request, res: Response): Promise<vo
     });
   } catch (error) {
     const err = error as APIError;
-    console.error("GitHub PAT validation failed:", err.message);
-    res.status(STATUS_CODES.UNAUTHORIZED).json({ error: MESSAGES.INVALID_TOKEN });
+    logger.error(`${err}, PAT validation failed`);
+    res
+      .status(STATUS_CODES.UNAUTHORIZED)
+      .json({ error: MESSAGES.INVALID_TOKEN });
   }
 };

@@ -5,24 +5,34 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IUser extends Document {
   userName: string;
   email?: string;
+  encryptedPat?: {
+    iv: string;
+    content: string;
+    tag: string;
+  };
 }
 
 // user schema
 const userSchema: Schema<IUser> = new Schema<IUser>(
   {
-    userName: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
+  userName: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
     email: {
       type: String,
       required: false,
       trim: true,
       lowercase: true,
     },
-  },
+  encryptedPat: {
+    iv:    { type: String },
+    content: { type: String },
+    tag:   { type: String },
+  }
+},
   { timestamps: true }
 );
 

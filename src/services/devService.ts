@@ -1,4 +1,5 @@
 // internal dependencies
+import logger from "../utils/logger.js";
 import { APIError } from "../common/types.js";
 import { API_ENDPOINTS } from "../common/constants.js";
 import { githubClient } from "../utils/githubClient.js";
@@ -24,7 +25,7 @@ export const fetchDeveloperPRStats = async (developer: string, token: string) =>
     return data;
   } catch (error) {
     const err = error as APIError;
-    console.error("GitHub Developer PR fetch error:", err.message);
+    logger.error("GitHub Developer PR fetch error:", err.message);
     throw new Error(err.message || "Failed to fetch developer PRs");
   }
 };
