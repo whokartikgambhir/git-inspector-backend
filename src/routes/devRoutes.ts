@@ -1,13 +1,21 @@
 // external dependencies
-import express from "express";
+import express, { Router } from "express";
 
 // internal dependencies
-import { getDeveloperAnalyticsController } from "../controllers/devController.js";
+import { API_ENDPOINTS } from "../common/constants.js";
 import { checkUserExists } from "../middlewares/validateUser.js";
 import { authenticateWithPAT } from "../middlewares/authMiddleware.js";
+import { getDeveloperAnalyticsController } from "../controllers/devController.js";
 
-const router = express.Router();
+const router: Router = express.Router();
 
-router.get("/prs/analytics", authenticateWithPAT, checkUserExists, getDeveloperAnalyticsController);
+// GET /prs/analytics - Developer analytics
+// this route provides analytics for a developer's pull requests
+router.get(
+  API_ENDPOINTS.PRS.ANALYTICS,
+  authenticateWithPAT,
+  checkUserExists,
+  getDeveloperAnalyticsController
+);
 
 export default router;

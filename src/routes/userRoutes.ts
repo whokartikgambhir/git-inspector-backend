@@ -1,55 +1,95 @@
 // external dependencies
-import express from "express";
-import type { Request, Response } from "express";
+import express, { Router, Request, Response } from "express";
 
 // internal dependencies
-import User from "../models/user.js";
+import User, { IUser } from "../models/user.js";
+import { APIError } from "../common/types.js";
+import { CreateUserDto } from "../common/dtos/user.dto.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants.js";
 
-const router = express.Router();
+const router: Router = express.Router();
 
-// Create a new user
-router.post("/users", async (req: Request, res: Response) => {
-  try {
-    const { userName, email } = req.body;
-    if (!userName)
-      return res.status(400).json({ error: "username is required" });
+// POST /users - Create a new user
+// this route creates a new user in the database if the userName does not already exist
+router.post(
+  API_ENDPOINTS.USER,
+  validateRequest(CreateUserDto),
+  async (req: Request, res: Response) => {
+    try {
+      const { userName, email } = req.body;
 
-    const existing = await User.findOne({ userName });
-    if (existing) return res.status(409).json({ error: "user already exists" });
+      if (!userName) {
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ error: "username is required" });
+        return;
+      }
 
-    const user = await User.create({ userName, email });
-    res.status(201).json(user);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+      const existing = await User.findOne({ userName });
+      if (existing) {
+        res.status(STATUS_CODES.CONFLICT).json({ error: MESSAGES.USER_EXISTS });
+        return;
+      }
 
-// Fetch users data
-router.get("/users", async (req: Request, res: Response) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Delete a user
-router.delete("/users", async (req: Request, res: Response) => {
-  try {
-    const { userName } = req.body;
-
-    const query: any = {};
-    if (userName) query.userName = userName;
-
-    const result = await User.deleteOne(query);
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ error: `User ${userName} not found` });
-    } else {
-      return res.status(200).json({ message: `User ${userName} deleted successfully` });
+      const user = await User.create({ userName, email });
+      res
+        .status(STATUS_CODES.CREATED)
+        .json({ message: MESSAGES.USER_CREATED, user });
+    } catch (error) {
+      const err = error as APIError;
+      res
+        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json({ error: err.message });
     }
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  }
+);
+
+// GET /users - Fetch all users
+// this route retrieves all users from the database
+router.get(API_ENDPOINTS.USER, async (req: Request, res: Response) => {
+  try {
+    const users = (await User.find()) as IUser[];
+    if (users.length === 0) {
+      res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ error: MESSAGES.USER_NOT_FOUND });
+      return;
+    }
+    res.status(STATUS_CODES.OK).json(users);
+  } catch (error) {
+    const err = error as APIError;
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message });
+  }
+});
+
+// DELETE /users?userName="" - Delete a user by userName (query param)
+// this route deletes a user if the userName query parameter is provided and exists in the database
+router.delete(API_ENDPOINTS.USER, async (req: Request, res: Response) => {
+  try {
+    const { userName } = req.query;
+    if (!userName || typeof userName !== "string") {
+      res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ error: "userName query parameter is required" });
+      return;
+    }
+
+    const result = await User.deleteOne({ userName });
+    if (result.deletedCount === 0) {
+      res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ error: `${MESSAGES.USER_NOT_FOUND}: ${userName}` });
+      return;
+    } else {
+      res
+        .status(STATUS_CODES.OK)
+        .json({ message: `${MESSAGES.USER_DELETED}: ${userName}` });
+      return;
+    }
+  } catch (error) {
+    const err = error as APIError;
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message });
   }
 });
 
