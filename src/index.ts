@@ -1,8 +1,8 @@
 // external dependencies
-import "reflect-metadata";
-import express from "express";
-import helmet from "helmet";
 import cors from "cors";
+import "reflect-metadata";
+import helmet from "helmet";
+import express from "express";
 import mongoose from "mongoose";
 
 // internal dependencies
@@ -23,6 +23,7 @@ import userRoutes from "./routes/userRoutes.js";
 import { apiRateLimiter } from "./utils/rateLimiter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { APIError } from "./common/types.js";
+import { connect } from "./utils/db.js";
 
 const app = express();
 
@@ -89,8 +90,8 @@ app.get(API_ENDPOINTS.HEALTH_CHECK, async (_, res) => {
 app.use(errorHandler);
 
 // Connect to MongoDB and start the server
-mongoose
-  .connect(config.mongoUri)
+mongoose;
+await connect()
   .then(() => {
     logger.info("MongoDB connected");
     app.listen(config.port, () =>

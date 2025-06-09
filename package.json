@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/axios": "^0.14.4",
     "@types/chai": "^5.2.2",
+    "@types/chai-http": "^4.2.4",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.2",
     "@types/express-rate-limit": "^6.0.2",

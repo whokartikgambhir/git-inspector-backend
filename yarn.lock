@@ -635,6 +635,13 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/chai-http@^4.2.4":
+  version "4.2.4"
+  resolved "https://registry.yarnpkg.com/@types/chai-http/-/chai-http-4.2.4.tgz#f2d6825b3994367da6aaf0fa28b9ab6a56743979"
+  integrity sha512-rmWIGfvKc5l4cEoj/z6qNKN33tkdzsSBxmTxP7lkdmWVHFZa0mwvFuItg7bGME7UoTQc6nizRdBXUz95RhK1nw==
+  dependencies:
+    chai-http "*"
+
 "@types/chai@^5.2.2":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-5.2.2.tgz#6f14cea18180ffc4416bc0fd12be05fdd73bdd6b"
@@ -1199,7 +1206,7 @@ chai-as-promised@^8.0.1:
   dependencies:
     check-error "^2.0.0"
 
-chai-http@^5.1.2:
+chai-http@*, chai-http@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/chai-http/-/chai-http-5.1.2.tgz#af491a70576d767f50db2969c1383e59aa661b2f"
   integrity sha512-UFup7mUGkkjmi9bGA7F6vfp3lzGQZjtL//CEd+a4C+vlynSv756XHDUK8PoYk/UpTBBXqSghjQaJOUMUxJXNaA==
