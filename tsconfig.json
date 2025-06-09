@@ -9,12 +9,14 @@
     "strict": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "isolatedModules": true
   },
   "include": [
     "src/**/*",
     "src/**/*.d.ts",
-    "tests/**/*"
+    "src/tests/**/*",
+    "src/tests"
   ],
   "exclude": [
     "node_modules",
