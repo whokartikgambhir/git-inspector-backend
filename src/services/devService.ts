@@ -1,8 +1,8 @@
 // internal dependencies
-import logger from "../utils/logger.js";
-import { APIError } from "../common/types.js";
-import { API_ENDPOINTS } from "../common/constants.js";
-import { githubClient } from "../utils/githubClient.js";
+import logger from "../utils/logger";
+import { APIError } from "../common/types";
+import { API_ENDPOINTS } from "../common/constants";
+import { githubClient } from "../utils/githubClient";
 
 /**
  * Fetches pull request statistics for a given developer from the GitHub API

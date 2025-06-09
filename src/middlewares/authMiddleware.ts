@@ -1,19 +1,12 @@
-// external dependencies
-import { Octokit } from "@octokit/rest";
 import { Response, NextFunction } from "express";
 
 // internal dependencies
-import { STATUS_CODES, MESSAGES } from "../common/constants.js";
-import { APIError, AuthenticatedRequest } from "../common/types.js";
-import logger from "../utils/logger.js";
+import { STATUS_CODES, MESSAGES } from "../common/constants";
+import { APIError, AuthenticatedRequest } from "../common/types";
+import logger from "../utils/logger";
 
 /**
  * Middleware to authenticate requests using GitHub Personal Access Token (PAT)
- * 
- * @param req - AuthenticatedRequest request object
- * @param res - express response object
- * @param next - next middleware function
- * @returns promise that resolves to void
  */
 export const authenticateWithPAT = async (
   req: AuthenticatedRequest,
@@ -34,8 +27,10 @@ export const authenticateWithPAT = async (
   }
 
   try {
-    // validates PAT by fetching the authenticated user's data from GitHub
+    // 💡 Dynamically import Octokit to support ESM in CommonJS
+    const { Octokit } = await import("@octokit/rest");
     const octokit = new Octokit({ auth: pat });
+
     const { data } = await octokit.users.getAuthenticated();
 
     req.user = {

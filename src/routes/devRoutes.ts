@@ -2,12 +2,12 @@
 import express, { Router } from "express";
 
 // internal dependencies
-import { API_ENDPOINTS } from "../common/constants.js";
-import { checkUserExists } from "../middlewares/validateUser.js";
-import { authenticateWithPAT } from "../middlewares/authMiddleware.js";
-import { getDeveloperAnalyticsController } from "../controllers/devController.js";
-import { GetMetricsDto } from "../common/dtos/pr.dto.js";
-import { validateRequest } from "../middlewares/validateRequest.js";
+import { API_ENDPOINTS } from "../common/constants";
+import { checkUserExists } from "../middlewares/validateUser";
+import { authenticateWithPAT } from "../middlewares/authMiddleware";
+import { getDeveloperAnalyticsController } from "../controllers/devController";
+import { GetMetricsDto } from "../common/dtos/pr.dto";
+import { validateRequest } from "../middlewares/validateRequest";
 
 const router: Router = express.Router();
 

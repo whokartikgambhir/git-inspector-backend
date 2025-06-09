@@ -70,14 +70,13 @@ export const API_ENDPOINTS = Object.freeze({
   })
 });
 
-// possible states for the database connection
-export const DB_STATES = Object.freeze({
-  DISCONNECTED: "disconnected",
-  CONNECTED: "connected",
-  CONNECTING: "connecting",
-  DISCONNECTING: "disconnecting",
-  UNKNOWN: "unknown",
-});
+export enum DB_STATES {
+  DISCONNECTED = "disconnected",
+  CONNECTED = "connected",
+  CONNECTING = "connecting",
+  DISCONNECTING = "disconnecting",
+  UNKNOWN = "unknown"
+}
 
 // possible states for GitHub pull requests
 export const GITHUB_STATES = Object.freeze({

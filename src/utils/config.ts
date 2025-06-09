@@ -3,7 +3,7 @@ import Joi from "joi";
 import mongoose from "mongoose";
 
 // internal dependencies
-import logger from "./logger.js";
+import logger from "./logger";
 
 // schema for expected environment variables
 const envSchema = Joi.object({
