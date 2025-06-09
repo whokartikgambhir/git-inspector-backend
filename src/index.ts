@@ -1,46 +1,55 @@
 // external dependencies
-import 'reflect-metadata';
-import dotenv from "dotenv";
+import "reflect-metadata";
 import express from "express";
+import helmet from "helmet";
+import cors from "cors";
 import mongoose from "mongoose";
 
 // internal dependencies
+import "dotenv/config";
+import "./utils/config";
 import {
   API_ENDPOINTS,
   DB_STATES,
-  DEFAULT_PORT,
   MESSAGES,
   STATUS_CODES,
 } from "./common/constants.js";
-import logger from './utils/logger.js';
+import { config } from "./utils/config.js";
+import logger from "./utils/logger.js";
 import prRoutes from "./routes/prRoutes.js";
-import { APIError } from "./common/types.js";
 import devRoutes from "./routes/devRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
-
-// load environment variables from .env file
-dotenv.config();
+import { apiRateLimiter } from "./utils/rateLimiter.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import { APIError } from "./common/types.js";
 
 const app = express();
-const PORT = process.env.PORT || DEFAULT_PORT;
 
-// middleware to parse JSON bodies
+// Security headers
+app.use(helmet());
+
+// CORS configuration
+app.use(cors({ origin: config.corsOrigin }));
+
+// Parse JSON bodies
 app.use(express.json());
 
-// register API route modules
+// Rate limiting middleware for all /api routes
+app.use(API_ENDPOINTS.API, apiRateLimiter);
+
+// Register API routes
 app.use(API_ENDPOINTS.API, authRoutes);
 app.use(API_ENDPOINTS.API, userRoutes);
 app.use(API_ENDPOINTS.API, prRoutes);
 app.use(API_ENDPOINTS.API, devRoutes);
 
-// health check endpoint to monitor server and DB status
+// Health check endpoint
 app.get(API_ENDPOINTS.HEALTH_CHECK, async (_, res) => {
   try {
     const dbState = mongoose.connection.readyState;
     let dbStatus: string;
 
-    // map Mongoose connection state to human-readable status
     switch (dbState) {
       case 0:
         dbStatus = DB_STATES.DISCONNECTED;
@@ -66,7 +75,9 @@ app.get(API_ENDPOINTS.HEALTH_CHECK, async (_, res) => {
     });
   } catch (error) {
     const err = error as APIError;
-    logger.error("Health check failed:", err.message);
+    logger.error(
+      `${err}, route: ${API_ENDPOINTS.HEALTH_CHECK}, Health check failed`
+    );
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       status: MESSAGES.INTERNAL_SERVER_ERROR,
       error: err.message,
@@ -74,13 +85,19 @@ app.get(API_ENDPOINTS.HEALTH_CHECK, async (_, res) => {
   }
 });
 
-// connect to MongoDB and start the server
+// Global error handler
+app.use(errorHandler);
+
+// Connect to MongoDB and start the server
 mongoose
-  .connect(process.env.MONGO_URI || "", {})
+  .connect(config.mongoUri)
   .then(() => {
     logger.info("MongoDB connected");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(config.port, () =>
+      logger.info(`Server running on port ${config.port}`)
+    );
   })
   .catch((err) => {
-    logger.error("MongoDB connection error:", err);
+    logger.error(`${err}, MongoDB connection error`);
+    process.exit(1);
   });

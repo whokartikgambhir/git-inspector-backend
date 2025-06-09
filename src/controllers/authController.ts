@@ -1,6 +1,6 @@
 // external dependencies
 import { Octokit } from "@octokit/rest";
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 
 // internal dependencies
 import User from "../models/user.js";
@@ -18,7 +18,8 @@ import { STATUS_CODES, MESSAGES } from "../common/constants.js";
  */
 export const validateGitHubPAT = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   const { pat } = req.body;
 
@@ -47,7 +48,7 @@ export const validateGitHubPAT = async (
       { new: true, upsert: true }
     );
 
-    logger.info(`{ user: ${userData.login} }, PAT validated successfully`);
+    logger.info(`user: ${userData.login}, PAT validated successfully`);
     res.status(STATUS_CODES.OK).json({
       message: MESSAGES.AUTH_SUCCESS,
       user: {
@@ -57,9 +58,21 @@ export const validateGitHubPAT = async (
     });
   } catch (error) {
     const err = error as APIError;
-    logger.error(`${err}, PAT validation failed`);
+    // Handle GitHub rate-limit errors
+    if (err.status === 403 && err.headers) {
+      const remaining = err.headers["x-ratelimit-remaining"];
+      const reset = err.headers["x-ratelimit-reset"];
+      if (remaining === "0") {
+        const resetDate = new Date(Number(reset) * 1000);
+        const msg = `GitHub rate limit exceeded. Try again at ${resetDate.toISOString()}`;
+        logger.warn(`route: ${req.originalUrl}, ${msg}`);
+        res.status(STATUS_CODES.TOO_MANY_REQUESTS).json({ error: msg });
+      }
+    }
+    logger.error(`error: ${err}, PAT validation failed`);
     res
       .status(STATUS_CODES.UNAUTHORIZED)
       .json({ error: MESSAGES.INVALID_TOKEN });
+    next(error);
   }
 };

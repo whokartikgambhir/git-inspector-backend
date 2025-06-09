@@ -1,8 +1,6 @@
 // external dependencies
 import crypto from "crypto";
-import dotenv from "dotenv";
-
-dotenv.config();
+import "dotenv/config";
 
 const rawKey = process.env.ENCRYPTION_KEY;
 if (!rawKey) {

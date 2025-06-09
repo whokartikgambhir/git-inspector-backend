@@ -1,11 +1,15 @@
 // external dependencies
 import { Request } from "express";
+import { IncomingHttpHeaders } from 'http';
 
 // interface for standardized API error objects
 export interface APIError {
   status: number;
   message: string;
   stack?: string;
+  headers: IncomingHttpHeaders & {
+    authorization?: string;
+  };
 }
 
 // interface for authenticated requests
