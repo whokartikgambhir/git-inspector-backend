@@ -3,7 +3,7 @@ import { Request } from "express";
 import { IncomingHttpHeaders } from 'http';
 
 // interface for standardized API error objects
-export interface APIError {
+export interface APIError extends Error {
   status: number;
   message: string;
   stack?: string;

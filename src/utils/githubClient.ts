@@ -2,12 +2,23 @@
 import axios, { AxiosInstance } from "axios";
 
 // internal dependencies
-import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants.js";
+import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants";
+
+/**
+ * Dynamically imports and creates an authenticated GitHub Octokit client
+ *
+ * @param pat - GitHub Personal Access Token
+ * @returns Promise resolving to Octokit instance
+ */
+export const createOctokitClient = async (pat: string) => {
+  const { Octokit } = await import("@octokit/rest");
+  return new Octokit({ auth: pat });
+};
 
 /**
  * Creates an Axios instance configured for GitHub API requests
  * 
- * @param token - gitHub Personal Access Token (PAT) for authentication
+ * @param token - GitHub Personal Access Token (PAT) for authentication
  * @returns axiosInstance with base URL and headers set for GitHub API
  * @throws error if token is missing
  */

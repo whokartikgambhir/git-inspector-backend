@@ -2,9 +2,9 @@
 import { Request, Response, NextFunction } from "express";
 
 // internal dependencies
-import User from "../models/user.js";
-import { APIError } from "../common/types.js";
-import { MESSAGES, STATUS_CODES } from "../common/constants.js";
+import User from "../models/user";
+import { APIError } from "../common/types";
+import { MESSAGES, STATUS_CODES } from "../common/constants";
 
 /**
  * Middleware to check if a developer (user) exists in the database

@@ -1,13 +1,13 @@
 // external dependencies
-import { Octokit } from "@octokit/rest";
 import type { Request, Response, NextFunction } from "express";
 
 // internal dependencies
-import User from "../models/user.js";
-import logger from "../utils/logger.js";
-import { encrypt } from "../utils/crypto.js";
-import { APIError } from "../common/types.js";
-import { STATUS_CODES, MESSAGES } from "../common/constants.js";
+import { createOctokitClient } from "../utils/githubClient";
+import User, { IUser } from "../models/user";
+import logger from "../utils/logger";
+import { encrypt } from "../utils/crypto";
+import { APIError } from "../common/types";
+import { STATUS_CODES, MESSAGES } from "../common/constants";
 
 /**
  * Validates the GitHub Personal Access Token (PAT), encrypts it and stores on user record
@@ -30,7 +30,7 @@ export const validateGitHubPAT = async (
     return;
   }
 
-  const octokit = new Octokit({ auth: pat });
+  const octokit = await createOctokitClient(pat);
 
   try {
     // fetch authenticated user's data from GitHub
@@ -46,7 +46,7 @@ export const validateGitHubPAT = async (
       { userName },
       { email, encryptedPat: encrypted },
       { new: true, upsert: true }
-    );
+    ) as IUser;
 
     logger.info(`user: ${userData.login}, PAT validated successfully`);
     res.status(STATUS_CODES.OK).json({

@@ -1,8 +1,8 @@
 // internal dependencies
-import logger from "../utils/logger.js";
-import { GITHUB_STATES } from "../common/constants.js";
-import { githubClient } from "../utils/githubClient.js";
-import { APIError, GitHubPR, GitHubRepo, MappedPR } from "../common/types.js";
+import logger from "../utils/logger";
+import { GITHUB_STATES } from "../common/constants";
+import { githubClient } from "../utils/githubClient";
+import { APIError, GitHubPR, GitHubRepo, MappedPR } from "../common/types";
 
 /**
  * Helper function to map a GitHub PR object to a simplified format

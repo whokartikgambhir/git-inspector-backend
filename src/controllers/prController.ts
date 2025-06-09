@@ -1,21 +1,21 @@
 // external dependencies
 import type { Response } from "express";
-import { cache, generateCacheKey } from "../utils/cache.js";
+import { cache, generateCacheKey } from "../utils/cache";
 
 // internal dependencies
 import {
   fetchOpenPullRequests,
   fetchOpenPullRequestsForAllRepos,
   fetchAllPullRequestsForUser,
-} from "../services/githubService.js";
-import { APIError, AuthenticatedRequest } from "../common/types.js";
+} from "../services/githubService";
+import { APIError, AuthenticatedRequest } from "../common/types";
 import {
   STATUS_CODES,
   MESSAGES,
   GITHUB_STATES,
   DEFAULT_PAGINATION,
-} from "../common/constants.js";
-import logger from "../utils/logger.js";
+} from "../common/constants";
+import logger from "../utils/logger";
 
 /**
  * GET /prs/:developer/open - Get open PRs for a developer
