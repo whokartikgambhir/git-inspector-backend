@@ -102,3 +102,5 @@ await connect()
     logger.error(`${err}, MongoDB connection error`);
     process.exit(1);
   });
+
+export default app;
