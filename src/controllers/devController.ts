@@ -2,6 +2,7 @@
 import type { Response } from "express";
 
 // internal dependencies
+import { cache, generateCacheKey } from "../utils/cache.js";
 import { APIError, AuthenticatedRequest, GitHubPR } from "../common/types.js";
 import { fetchDeveloperPRStats } from "../services/devService.js";
 import {
@@ -48,29 +49,41 @@ export const getDeveloperAnalyticsController = async (
     1,
     parseInt(limit as string) || DEFAULT_PAGINATION.LIMIT
   );
-  const offset = (pageNum - 1) * limitNum;
 
   try {
-    // fetch PR stats from GitHub API
+    // Cache key based on params
+    const cacheKey = generateCacheKey("devAnalytics", {
+      developer,
+      page: pageNum,
+      limit: limitNum,
+    });
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.status(STATUS_CODES.OK).json(cached);
+      logger.info("cached result");
+      return;
+    }
+
+    // Fetch PR stats
     const data = await fetchDeveloperPRStats(developer, user.token);
 
-    let open = 0,
-      closed = 0,
-      merged = 0;
+    let open = 0;
+    let closed = 0;
+    let merged = 0;
     const mergeTimes: number[] = [];
 
-    // map and analyze all PRs
     const allPrs = (data.items as GitHubPR[]).map((pr) => {
       const isOpen = pr.state === GITHUB_STATES.OPEN;
-      const isMerged = pr.pull_request?.merged_at !== null;
+      const isMerged = pr.pull_request?.merged_at != null;
       const isClosed = pr.state === GITHUB_STATES.CLOSED && !isMerged;
 
       if (isOpen) open++;
-      if (isMerged && pr.pull_request && pr.pull_request.merged_at) {
+      if (isMerged) {
         merged++;
-        const created = new Date(pr.created_at);
-        const mergedAt = new Date(pr.pull_request.merged_at);
-        mergeTimes.push(mergedAt.getTime() - created.getTime());
+        mergeTimes.push(
+          new Date(pr.pull_request!.merged_at!).getTime() -
+            new Date(pr.created_at).getTime()
+        );
       }
       if (isClosed) closed++;
 
@@ -84,26 +97,24 @@ export const getDeveloperAnalyticsController = async (
       };
     });
 
-    // paginate PRs for response
+    const offset = (pageNum - 1) * limitNum;
     const paginatedPRs = allPrs.slice(offset, offset + limitNum);
 
-    // calculate average merge time in a human-readable format
     const averageMergeTime = mergeTimes.length
       ? (() => {
           const avgMs =
-            mergeTimes.reduce((a, b) => a + b, 0) / mergeTimes.length;
-          const hours = Math.floor(avgMs / (1000 * 60 * 60));
-          const minutes = Math.floor((avgMs % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((avgMs % (1000 * 60)) / 1000);
-          return `${hours} hr: ${minutes} min: ${seconds} sec`;
+            mergeTimes.reduce((sum, t) => sum + t, 0) / mergeTimes.length;
+          const hrs = Math.floor(avgMs / 3600000);
+          const mins = Math.floor((avgMs % 3600000) / 60000);
+          const secs = Math.floor((avgMs % 60000) / 1000);
+          return `${hrs} hr: ${mins} min: ${secs} sec`;
         })()
       : null;
 
-    // calculate merge success rate as a percentage
     const successRate =
-      closed + merged > 0 ? (merged / (closed + merged)) * 100 : 0;
+      merged + closed > 0 ? (merged / (merged + closed)) * 100 : 0;
 
-    res.status(STATUS_CODES.OK).json({
+    const result = {
       developer,
       totalPRs: data.total_count,
       openPRs: open,
@@ -112,10 +123,27 @@ export const getDeveloperAnalyticsController = async (
       averageMergeTime,
       successRate: `${successRate.toFixed(2)}%`,
       prs: paginatedPRs,
-    });
+    };
+
+    // Store in cache
+    cache.set(cacheKey, result, 60);
+
+    res.status(STATUS_CODES.OK).json(result);
   } catch (error) {
     const err = error as APIError;
-    logger.error("Developer analytics error:", err.message);
+    if (err.status === 403 && err.headers) {
+      const remaining = err.headers["x-ratelimit-remaining"];
+      const reset = err.headers["x-ratelimit-reset"];
+      if (remaining === "0") {
+        const resetDate = new Date(Number(reset) * 1000);
+        const msg = `GitHub rate limit exceeded. Try again at ${resetDate.toISOString()}`;
+        logger.warn(`developer: ${user}, ${msg}`);
+        res.status(STATUS_CODES.TOO_MANY_REQUESTS).json({ error: msg });
+        return;
+      }
+    }
+    logger.error(`err: ${err}, 'Failed to fetch developer analytics`);
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    return;
   }
 };
