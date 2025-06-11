@@ -90,7 +90,8 @@
           "200": {
             "description": "List of open PRs"
           }
-        }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://github-pr-analytics-2hx7.onrender.com/api/prs/CodeWithHarry/open?repo=Sigma-Web-Dev-Course&limit=1\" \\\n  -H \"Authorization: Bearer <TOKEN>\"\n```"
       }
     },
     "/prs/metrics/{developer}": {
@@ -110,7 +111,8 @@
           "200": {
             "description": "PR timing insights"
           }
-        }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://github-pr-analytics-2hx7.onrender.com/api/prs/metrics/whokartikgambhir\"\n```"
       }
     },
     "/user": {
@@ -120,7 +122,8 @@
           "200": {
             "description": "List of users"
           }
-        }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://github-pr-analytics-2hx7.onrender.com/api/users\"\n```"
       },
       "post": {
         "summary": "Create a new user",
@@ -155,7 +158,8 @@
           "409": {
             "description": "User already exists"
           }
-        }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X POST \"https://github-pr-analytics-2hx7.onrender.com/api/users\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{ \"userName\": \"CodeWithHarry\" }'\n```"
       }
     },
     "/user/{username}": {
@@ -175,7 +179,8 @@
           "200": {
             "description": "User deleted"
           }
-        }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X DELETE \"https://github-pr-analytics-2hx7.onrender.com/api/users?userName=whokartiakgambhir\"\n```"
       }
     },
     "/health": {
@@ -185,7 +190,8 @@
           "200": {
             "description": "API is healthy"
           }
-        }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://github-pr-analytics-2hx7.onrender.com/health\"\n```"
       }
     }
   }
