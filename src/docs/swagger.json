@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://github-pr-analytics-2hx7.onrender.com"
+      "url": "https://github-pr-analytics-2hx7.onrender.com/api"
     }
   ],
   "components": {
@@ -39,7 +39,9 @@
                     "type": "string"
                   }
                 },
-                "required": ["token"]
+                "required": [
+                  "token"
+                ]
               }
             }
           }
@@ -117,6 +119,42 @@
         "responses": {
           "200": {
             "description": "List of users"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "409": {
+            "description": "User already exists"
           }
         }
       }
