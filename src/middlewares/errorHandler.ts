@@ -2,9 +2,9 @@
 import { Request, Response, NextFunction } from 'express';
 
 // internal dependencies
-import { MESSAGES, STATUS_CODES } from '../common/constants.js';
-import { APIError } from '../common/types.js';
-import logger from '../utils/logger.js';
+import { MESSAGES, STATUS_CODES } from '../common/constants';
+import { APIError } from '../common/types';
+import logger from '../utils/logger';
 
 /**
  * Express error handling middleware
