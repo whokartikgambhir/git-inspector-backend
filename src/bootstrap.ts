@@ -1,4 +1,6 @@
 // external dependencies
+import swaggerUi from "swagger-ui-express";
+import * as swaggerDocument from "./docs/swagger.json";
 import helmet from "helmet";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -36,6 +38,10 @@ function initMiddlewares(app: Application): void {
  * Registers all API routes
  */
 function initRoutes(app: Application): void {
+  // Serve Swagger API Docs
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+  // Register API routes
   app.use(API_ENDPOINTS.API, authRoutes);
   app.use(API_ENDPOINTS.API, userRoutes);
   app.use(API_ENDPOINTS.API, prRoutes);

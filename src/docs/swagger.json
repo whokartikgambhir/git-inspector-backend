@@ -1,0 +1,155 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "GitHub PR Analytics API",
+    "version": "1.0.0",
+    "description": "API documentation for analyzing GitHub pull requests using authenticated PAT tokens."
+  },
+  "servers": [
+    {
+      "url": "https://github-pr-analytics-2hx7.onrender.com"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth": {
+      "post": {
+        "summary": "Authenticate with GitHub PAT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authentication"
+          }
+        }
+      }
+    },
+    "/prs/analytics": {
+      "get": {
+        "summary": "Get developer PR analytics",
+        "parameters": [
+          {
+            "name": "developer",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PR analytics returned"
+          }
+        }
+      }
+    },
+    "/prs/{developer}/open": {
+      "get": {
+        "summary": "List open PRs by developer",
+        "parameters": [
+          {
+            "name": "developer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of open PRs"
+          }
+        }
+      }
+    },
+    "/prs/metrics/{developer}": {
+      "get": {
+        "summary": "PR timing metrics",
+        "parameters": [
+          {
+            "name": "developer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PR timing insights"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Get all users",
+        "responses": {
+          "200": {
+            "description": "List of users"
+          }
+        }
+      }
+    },
+    "/user/{username}": {
+      "delete": {
+        "summary": "Delete user by username",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "API is healthy"
+          }
+        }
+      }
+    }
+  }
+}
