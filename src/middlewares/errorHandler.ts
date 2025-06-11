@@ -1,5 +1,5 @@
 // external dependencies
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 // internal dependencies
 import { MESSAGES, STATUS_CODES } from '../common/constants.js';
@@ -14,11 +14,13 @@ import logger from '../utils/logger.js';
  * @param err - APIError error object
  * @param req - express request object
  * @param res - express response object
+ * @param next - express next middleware function (required for error handling signature)
  */
 export const errorHandler = (
   err: APIError,
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): void => {
   // logs error with a timestamp and stack trace if available
   logger.error(`[${new Date().toISOString()}] Error:`, err.stack || err);
@@ -34,5 +36,6 @@ export const errorHandler = (
     response.stack = err.stack;
   }
 
+  logger.info(next);
   res.status(status).json(response);
 };
