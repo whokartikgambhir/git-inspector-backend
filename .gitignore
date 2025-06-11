@@ -15,3 +15,4 @@ dist
 .idea/
 
 coverage/
+.nyc_output/

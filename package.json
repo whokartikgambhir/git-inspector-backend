@@ -52,6 +52,7 @@
     "mocha": "^11.6.0",
     "nodemon": "^3.1.10",
     "nyc": "^17.1.0",
+    "open-cli": "^8.0.0",
     "proxyquire": "^2.1.3",
     "shx": "^0.3.4",
     "sinon": "^20.0.0",
@@ -70,11 +71,29 @@
     "dev": "tsx src/index.ts",
     "build": "npm run compile",
     "start": "node dist/index.js",
-    "test": "yarn compile && mocha \"dist/tests/**/*.test.js\"",
+    "test": "nyc mocha -r ts-node/register src/tests/**/*.test.ts --exit",
+    "coverage": "nyc mocha -r ts-node/register src/tests/**/*.test.ts --exit && open-cli coverage/lcov-report/index.html",
     "test:watch": "mocha -r ts-node/register --watch src/tests/**/*.test.ts",
-    "coverage": "npx nyc mocha \"dist/tests/**/*.test.js\"",
     "clean": "shx rm -rf node_modules yarn.lock",
     "reinstall": "yarn clean && yarn install",
     "prepare": "husky install"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.test.ts",
+      "tests/**"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "all": true
   }
 }
