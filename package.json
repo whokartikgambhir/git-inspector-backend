@@ -65,7 +65,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "compile": "shx rm -rf dist && tsc",
+    "compile": "tsc",
     "lint": "eslint --max-warnings=0 --ext .ts,.js src/",
     "dev": "tsx src/index.ts",
     "build": "npm run compile",
