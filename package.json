@@ -9,6 +9,22 @@
   "dependencies": {
     "@octokit/request": "^10.0.2",
     "@octokit/rest": "^22.0.0",
+    "@types/axios": "^0.14.4",
+    "@types/chai": "^4.3.4",
+    "@types/chai-http": "^4.2.4",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.2",
+    "@types/express-rate-limit": "^6.0.2",
+    "@types/helmet": "^4.0.0",
+    "@types/joi": "^17.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^24.0.0",
+    "@types/node-cache": "^4.2.5",
+    "@types/proxyquire": "^1.3.31",
+    "@types/sinon": "^17.0.4",
+    "@types/supertest": "^6.0.3",
+    "@types/winston": "^2.4.4",
     "axios": "^1.9.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -22,24 +38,7 @@
     "mongoose": "^8.15.1",
     "node-cache": "^5.1.2",
     "reflect-metadata": "^0.2.2",
-    "winston": "^3.17.0",
-
-    "@types/node": "^24.0.0",
-    "@types/mocha": "^10.0.10",
-    "@types/chai": "^4.3.4",
-    "@types/chai-http": "^4.2.4",
-    "@types/sinon": "^17.0.4",
-    "@types/supertest": "^6.0.3",
-    "@types/express": "^5.0.2",
-    "@types/express-rate-limit": "^6.0.2",
-    "@types/joi": "^17.2.3",
-    "@types/mongoose": "^5.11.97",
-    "@types/proxyquire": "^1.3.31",
-    "@types/node-cache": "^4.2.5",
-    "@types/helmet": "^4.0.0",
-    "@types/winston": "^2.4.4",
-    "@types/cors": "^2.8.19",
-    "@types/axios": "^0.14.4"
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -79,10 +78,21 @@
     "prepare": "husky install"
   },
   "nyc": {
-    "extension": [".ts"],
-    "include": ["src/**/*.ts"],
-    "exclude": ["**/*.test.ts", "tests/**"],
-    "reporter": ["text", "html", "lcov"],
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.test.ts",
+      "tests/**"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
     "all": true
   }
 }
