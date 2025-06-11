@@ -1,67 +1,70 @@
 # AI_USAGE.md
 
-## 👩‍💻 AI Tools Used
+## 🤖 AI Tools Used
 
-- **ChatGPT (GPT-4 by OpenAI)**
+- **ChatGPT (GPT-4, OpenAI)**
 - **GitHub Copilot**
 
 ---
 
-## ⚙️ How AI Helped in Development
+## 🛠️ How AI Assisted in the Development Process
 
-### 🔧 1. Project Architecture & Setup
-- Planned the overall folder structure for a scalable Express.js + TypeScript backend.
-- Suggested RESTful API route designs and naming conventions based on best practices.
+### 🧱 1. Project Design & Architecture
+- Defined a clean, scalable folder structure (`controllers/`, `routes/`, `services/`, `middlewares/`, `common/`).
+- Proposed best practices for RESTful API route design and naming conventions.
 
-### 🔐 2. GitHub Authentication & API Integration
-- Helped implement middleware for validating GitHub Personal Access Tokens (PAT).
-- Guided on using Octokit to interact with GitHub APIs (e.g., list PRs, handle rate limits).
-- Assisted in error handling when GitHub APIs failed due to missing tokens or limits.
+### 🔐 2. Authentication & GitHub API
+- Guided implementation of GitHub Personal Access Token (PAT) validation middleware.
+- Helped configure **Octokit** for authenticated GitHub API interactions (listing PRs, metrics).
+- Suggested solutions for handling GitHub API rate limits and errors.
 
-### 🧠 3. Business Logic & MongoDB Queries
-- Suggested optimized aggregation pipelines for:
-  - Calculating average PR open time.
-  - Identifying longest-running PRs.
-  - Developer-specific PR metrics (success rate, counts).
-- Helped design the logic for calculating PR timings both for open and closed states.
+### 🧠 3. PR Analytics Logic & MongoDB Aggregation
+- Helped write aggregation logic for:
+  - Time PRs remain open before merge/close.
+  - Longest-running open PRs.
+  - Developer-specific success/failure metrics.
+- Improved query efficiency and reduced redundant API calls via caching.
 
 ### 🔒 4. Security Enhancements
-- Advised encrypting stored PAT tokens with a secret key using crypto utilities.
-- Identified the need for `.env` configuration and recommended creating `.env.example`.
+- Recommended encrypting PAT tokens using Node.js crypto.
+- Helped write secure `.env` handling with a fallback config strategy.
+- Suggested rate limiting and Helmet middleware for basic protection.
 
-### 🧪 5. Testing Strategy
-- Provided boilerplate structure for unit testing with:
-  - **Supertest** for HTTP endpoint tests.
-  - **Sinon** for stubbing GitHub API and services.
-- Suggested test cases for each route, including edge conditions like missing params or invalid tokens.
+### 🧪 5. Unit Testing & Coverage
+- Helped define test strategy using **Mocha**, **Chai**, **Sinon**, and **Supertest**.
+- Provided sample stubs and mocks for Octokit and middleware layers.
+- Assisted in configuring **nyc** for test coverage reporting.
 
-### 📦 6. Dockerization
-- Assisted in writing a minimal and production-ready Dockerfile to run the TypeScript project efficiently.
-
----
-
-## 💡 Examples of Prompts Used with ChatGPT
-
-> “Help me calculate average time between PR creation and merge using MongoDB.”  
-> “How to mock Octokit and GitHub API calls in unit tests with Supertest?”  
-> “Suggest a clean folder structure for an Express.js project with validation and caching.”  
-> “How to handle GitHub rate limiting gracefully in Node.js?”
+### 🐳 6. Docker & CI Readiness
+- Wrote a production-grade Dockerfile for TS-based Express apps.
+- Explained multistage builds and Docker environment variables.
+- Helped resolve Render deployment issues (e.g., `shx`, type resolution bugs).
 
 ---
 
-## 🚀 Outcome of Using AI
+## ✨ Example Prompts Used
 
-- Accelerated development significantly by reducing trial-and-error for edge case logic.
-- Ensured REST compliance and scalable code design.
-- Improved test coverage with structured mocks and reusable patterns.
-- Maintained code clarity, documentation, and better security practices.
+> “Create Express middleware for validating GitHub PAT token with Octokit.”  
+> “How to calculate PR average open time using MongoDB aggregation?”  
+> “Write unit tests for Express route with class-validator and Octokit stub.”  
+> “Suggest a Dockerfile for a TypeScript + Node.js project with Yarn and env vars.”  
+> “How to test coverage with nyc and Mocha for TypeScript project?”
 
 ---
 
-## 🧾 Summary
+## 🚀 Benefits Achieved
 
-AI tools acted like a coding assistant — helping with:
-- Implementation speed
-- Query correctness
-- Clean architecture
-- Production readiness
+- ⚡ **Faster development**: Iterated rapidly with accurate feedback.
+- 🧼 **Cleaner code**: Followed well-structured and readable design.
+- 🛡 **Better security**: Adopted safer practices (e.g., token encryption, validation).
+- 📊 **Improved testing**: Generated meaningful test coverage with mocks.
+- 🔄 **Seamless deployment**: Solved common container & deployment errors.
+
+---
+
+## 📌 Final Note
+
+AI tools acted as a pair programmer:
+- Reduced context-switching
+- Boosted confidence in implementation
+- Shortened the learning curve for production-readiness
