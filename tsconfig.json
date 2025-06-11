@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2021",
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "rootDir": "./src",
@@ -10,9 +10,8 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "isolatedModules": true,
-    "types": ["node", "mocha"]
+    "isolatedModules": true
   },
-  "include": ["src/**/*", "src/tests/**/*", "tests/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "coverage"]
 }
