@@ -1,94 +1,114 @@
-GitHub PR Analytics API
+# GitHub PR Analytics API
 
-A production-ready backend API built with Express.js, TypeScript, and MongoDB that integrates with the GitHub API to provide powerful pull request analytics.
+A production-ready backend API built with **Express.js**, **TypeScript**, and **MongoDB** that integrates with the GitHub API to provide powerful pull request analytics.
 
-📌 Features
+---
 
-🔐 GitHub PAT Authentication
+## 📌 Features
 
-📊 Developer PR Analytics
+- 🔐 **GitHub PAT Authentication**
+- 📊 **Developer PR Analytics**
+- 📂 **Open PR Reports**
+- ⏱️ **PR Timing Metrics**
+- 🛡️ **Input Validation** with `class-validator`
+- ❗ **Centralized Error Handling**
+- 🚀 **Production-ready Dockerfile**
+- 🧪 **Unit Tests** with `Mocha`, `Chai`, `Sinon`, `Supertest`
+- 🧠 **AI-accelerated development** (see `AI_USAGE.md`)
 
-📂 Open PR Reports
+---
 
-⏱️ PR Timing Metrics
+## 🧱 Tech Stack
 
-🛡️ Input Validation with class-validator
+- **Node.js**, **Express.js**
+- **TypeScript**
+- **MongoDB**
+- **Octokit (GitHub API)**
+- **Docker**
+- **Mocha + Chai + Sinon + Supertest**
 
-❗ Centralized Error Handling
+---
 
-🚀 Production-ready Dockerfile
+## 📚 API Documentation
 
-🧪 Unit Tests with Mocha, Chai, Sinon, Supertest
+See full documentation in [`API_DOCS.md`](./API_DOCS.md)
 
-🧠 AI-accelerated development (see AI_USAGE.md)
+---
 
-🧱 Tech Stack
+## 🔐 Authentication
 
-Node.js, Express.js
+Use a **GitHub Personal Access Token (PAT)** in your `Authorization` header for all requests:
 
-TypeScript
-
-MongoDB
-
-Octokit (GitHub API)
-
-Docker
-
-Mocha + Chai + Sinon + Supertest
-
-🧭 API Documentation
-
-See full documentation in API_DOCS.md
-
-🔐 Authentication
-
-Use a GitHub Personal Access Token (PAT) in your Authorization header for all requests:
-
+```http
 Authorization: Bearer <your-github-pat>
+````
 
-🚀 Getting Started
+---
 
-1️⃣ Clone the Repository
+## 🚀 Getting Started
 
+### 1️⃣ Clone the Repository
+
+```bash
 git clone https://github.com/whokartikgambhir/github-pr-analytics.git
 cd github-pr-analytics
 yarn install
+```
 
-2️⃣ Set up Environment Variables
+### 2️⃣ Set Environment Variables
 
-Create a .env file and add:
+Create a `.env` file and fill in:
 
+```
 PORT=3000
 MONGO_URI=<your-mongodb-uri>
 GITHUB_PAT_SECRET_KEY=<encryption-key>
 GITHUB_API_BASE_URL=https://api.github.com
+```
 
-3️⃣ Run the Application
+---
 
-Development:
+### 3️⃣ Run the Application
 
+#### Development:
+
+```bash
 yarn dev
+```
 
-Production:
+#### Production:
 
+```bash
 yarn build
 yarn start
+```
 
-🐳 Docker Setup
+---
+
+### 🐳 Docker Setup
 
 To build and run with Docker:
 
+```bash
 docker build -t github-pr-analytics .
 docker run -p 3000:3000 --env-file .env github-pr-analytics
+```
 
-🧪 Running Tests
+---
 
+### 🧪 Run Tests and Coverage
+
+```bash
 yarn coverage
+```
 
-This runs unit tests and generates a coverage report under /coverage.
+Generates a full test coverage report under `/coverage`.
 
-📂 Project Structure
+---
 
+## 📂 Project Structure
+
+```
 github-pr-analytics/
 ├── src/
 │   ├── controllers/
@@ -104,45 +124,30 @@ github-pr-analytics/
 ├── Dockerfile
 ├── .env.example
 ├── README.md
+```
 
-📊 Example Endpoints
+---
 
-Endpoint
+## 📊 Example Endpoints
 
-Description
+| Method | Endpoint                        | Description                |
+| ------ | ------------------------------- | -------------------------- |
+| POST   | `/auth`                         | Authenticate GitHub PAT    |
+| GET    | `/prs/analytics?developer=user` | Developer PR summary       |
+| GET    | `/prs/:developer/open`          | List open PRs by developer |
+| GET    | `/prs/metrics/:developer`       | PR timing insights         |
+| GET    | `/user`                         | List all users             |
+| DELETE | `/user/:username`               | Remove a user              |
+| GET    | `/health`                       | Health check               |
 
-POST /auth
+---
 
-Authenticate GitHub PAT
+## 🧠 AI Usage
 
-GET /prs/analytics?developer=
+See [`AI_USAGE.md`](./AI_USAGE.md) for how AI tools accelerated development and improved code quality.
 
-Developer PR summary
+---
 
-GET /prs/:developer/open
-
-List open PRs by developer
-
-GET /prs/metrics/:developer
-
-PR timing insights
-
-GET /user
-
-List all users
-
-DELETE /user/:username
-
-Remove a user
-
-GET /health
-
-Health check
-
-🧠 AI Usage
-
-See AI_USAGE.md for how AI tools accelerated development and improved code quality.
-
-📄 License
+## 📄 License
 
 MIT © Kartik Gambhir
