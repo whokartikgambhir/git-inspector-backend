@@ -11,9 +11,9 @@ import {
   DB_STATES,
   MESSAGES,
   STATUS_CODES,
-} from "../../common/constants";
-import app from "../../index";
-import * as dbUtils from "../../utils/db";
+} from "../common/constants";
+import app from "../index";
+import * as dbUtils from "../utils/db";
 
 describe(`GET ${API_ENDPOINTS.HEALTH_CHECK}`, () => {
   beforeEach(() => {

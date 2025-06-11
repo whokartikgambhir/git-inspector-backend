@@ -6,12 +6,12 @@ import { createServer } from "http";
 import { Octokit } from "@octokit/rest";
 
 // internal dependencies
-import app from "../../index";
-import * as dbUtils from "../../utils/db";
-import * as userModule from "../../models/user";
-import * as cryptoUtils from "../../utils/crypto";
-import * as githubClient from "../../utils/githubClient";
-import { API_ENDPOINTS, MESSAGES, STATUS_CODES } from "../../common/constants";
+import app from "../index";
+import * as dbUtils from "../utils/db";
+import * as userModule from "../models/user";
+import * as cryptoUtils from "../utils/crypto";
+import * as githubClient from "../utils/githubClient";
+import { API_ENDPOINTS, MESSAGES, STATUS_CODES } from "../common/constants";
 
 describe(`POST ${API_ENDPOINTS.AUTH}`, () => {
   beforeEach(() => {
