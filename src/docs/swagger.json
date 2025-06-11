@@ -134,13 +134,12 @@
                   "username": {
                     "type": "string"
                   },
-                  "token": {
+                  "email": {
                     "type": "string"
                   }
                 },
                 "required": [
-                  "username",
-                  "token"
+                  "username"
                 ]
               }
             }
