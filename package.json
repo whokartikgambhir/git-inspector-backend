@@ -47,6 +47,7 @@
     "chai": "4.3.7",
     "chai-as-promised": "^8.0.1",
     "chai-http": "^5.1.2",
+    "codecov": "^3.8.3",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
     "mocha": "^11.6.0",
