@@ -5,10 +5,10 @@ import request from "supertest";
 import { createServer } from "http";
 
 // internal dependencies
-import app from "../../index";
-import User from "../../models/user";
-import * as dbUtils from "../../utils/db";
-import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../../common/constants";
+import app from "../index";
+import User from "../models/user";
+import * as dbUtils from "../utils/db";
+import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants";
 
 describe(`User Routes ${API_ENDPOINTS.USER}`, () => {
   beforeEach(() => {

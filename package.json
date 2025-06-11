@@ -57,6 +57,7 @@
     "sinon": "^20.0.0",
     "supertest": "^7.1.1",
     "ts-jest": "^29.3.4",
+    "ts-mocha": "^11.1.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
@@ -71,7 +72,7 @@
     "start": "node dist/index.js",
     "test": "yarn compile && mocha \"dist/tests/**/*.test.js\"",
     "test:watch": "mocha -r ts-node/register --watch src/tests/**/*.test.ts",
-    "coverage": "nyc mocha -r ts-node/register src/tests/**/*.test.ts",
+    "coverage": "npx nyc mocha \"dist/tests/**/*.test.js\"",
     "clean": "shx rm -rf node_modules yarn.lock",
     "reinstall": "yarn clean && yarn install",
     "prepare": "husky install"

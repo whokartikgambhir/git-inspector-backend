@@ -6,10 +6,10 @@ import request from "supertest";
 import express, { Application, Response, NextFunction } from "express";
 
 // internal dependencies
-import * as devService from "../../services/devService";
-import { cache } from "../../utils/cache";
-import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../../common/constants";
-import { AuthenticatedRequest } from "../../common/types";
+import * as devService from "../services/devService";
+import { cache } from "../utils/cache";
+import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants";
+import { AuthenticatedRequest } from "../common/types";
 
 describe(`GET ${API_ENDPOINTS.PRS.ANALYTICS}`, () => {
   const devAnalyticsEndpoint = `${API_ENDPOINTS.API}${API_ENDPOINTS.PRS.ANALYTICS}`;
@@ -40,7 +40,7 @@ describe(`GET ${API_ENDPOINTS.PRS.ANALYTICS}`, () => {
     ) => next();
 
     // all middleware stubbed
-    const devRoutes = proxyquire("../../routes/devRoutes", {
+     const devRoutes = proxyquire("../routes/devRoutes", {
       "../middlewares/authMiddleware": {
         authenticateWithPAT: authenticateWithPATStub,
       },
@@ -111,7 +111,7 @@ describe(`GET ${API_ENDPOINTS.PRS.ANALYTICS}`, () => {
   it("returns 401 if Authorization header is missing", async () => {
     sinon.restore();
 
-    const devRoutes = (await import("../../routes/devRoutes")).default;
+    const devRoutes = (await import("../routes/devRoutes")).default;
     const freshApp = express();
     freshApp.use(express.json());
     freshApp.use(API_ENDPOINTS.API, devRoutes);

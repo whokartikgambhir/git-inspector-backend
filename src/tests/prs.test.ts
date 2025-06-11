@@ -6,10 +6,10 @@ import request from "supertest";
 import express, { Application, Response, NextFunction } from "express";
 
 // internal dependencies
-import * as prService from "../../services/githubService";
-import { cache } from "../../utils/cache";
-import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../../common/constants";
-import { AuthenticatedRequest, MappedPR } from "../../common/types";
+import * as prService from "../services/githubService";
+import { cache } from "../utils/cache";
+import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants";
+import { AuthenticatedRequest, MappedPR } from "../common/types";
 
 describe("PR API Endpoints", () => {
   const openPrsEndpoint = `${API_ENDPOINTS.API}/prs/mockuser/open`;
@@ -39,7 +39,7 @@ describe("PR API Endpoints", () => {
       next: NextFunction
     ) => next();
 
-    const prRoutes = proxyquire("../../routes/prRoutes", {
+    const prRoutes = proxyquire("../routes/prRoutes", {
       "../middlewares/authMiddleware": {
         authenticateWithPAT: authenticateWithPATStub,
       },
@@ -113,7 +113,7 @@ describe("PR API Endpoints", () => {
 
   it("should return 401 if Authorization header is missing", async () => {
     sinon.restore();
-    const prRoutes = (await import("../../routes/prRoutes")).default;
+    const prRoutes = (await import("../routes/prRoutes")).default;
     const freshApp = express();
     freshApp.use(express.json());
     freshApp.use(API_ENDPOINTS.API, prRoutes);
