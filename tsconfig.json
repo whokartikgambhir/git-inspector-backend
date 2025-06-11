@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
+    "lib": ["es2020"],
     "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
@@ -10,7 +11,8 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": ["mocha", "node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "coverage"]
