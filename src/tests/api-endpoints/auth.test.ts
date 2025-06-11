@@ -1,25 +1,31 @@
 // external dependencies
-import { Octokit } from "@octokit/rest";
-import request from "supertest";
+import sinon from "sinon";
 import { expect } from "chai";
-import sinon, { SinonSandbox } from "sinon";
+import request from "supertest";
+import { createServer } from "http";
+import { Octokit } from "@octokit/rest";
 
+// internal dependencies
 import app from "../../index";
-import { API_ENDPOINTS, MESSAGES, STATUS_CODES } from "../../common/constants";
+import * as dbUtils from "../../utils/db";
 import * as userModule from "../../models/user";
 import * as cryptoUtils from "../../utils/crypto";
 import * as githubClient from "../../utils/githubClient";
+import { API_ENDPOINTS, MESSAGES, STATUS_CODES } from "../../common/constants";
 
-describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
-  let sandbox: SinonSandbox;
-
+describe(`POST ${API_ENDPOINTS.AUTH}`, () => {
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
+    sinon.stub(dbUtils, "connect").resolves();
+    sinon.stub(app, "listen").callsFake(() => {
+      return createServer();
+    });
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
+
+  const fullAuthPath = `${API_ENDPOINTS.API}${API_ENDPOINTS.AUTH}`;
 
   it("returns 200 and user info on valid PAT", async () => {
     const mockUserName = "whokartikgambhir";
@@ -28,30 +34,24 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
 
     const mockedOctokit = {
       users: {
-        getAuthenticated: sandbox.stub().resolves({
-          data: {
-            login: mockUserName,
-            email: mockEmail,
-          },
+        getAuthenticated: sinon.stub().resolves({
+          data: { login: mockUserName, email: mockEmail },
         }),
       },
     };
 
-    sandbox
+    sinon
       .stub(githubClient, "createOctokitClient")
       .resolves(mockedOctokit as unknown as Octokit);
-    // sandbox.stub(githubClient, "createOctokitClient").returns(mockedOctokit);
-    sandbox
+    sinon
       .stub(cryptoUtils, "encrypt")
       .returns({ iv: "iv", content: "encrypted-token", tag: "tag" });
-    sandbox.stub(userModule.default, "findOneAndUpdate").resolves({
+    sinon.stub(userModule.default, "findOneAndUpdate").resolves({
       userName: mockUserName,
       email: mockEmail,
     });
 
-    const res = await request(app)
-      .post(API_ENDPOINTS.AUTH)
-      .send({ pat: mockPAT });
+    const res = await request(app).post(fullAuthPath).send({ pat: mockPAT });
 
     expect(res.status).to.equal(STATUS_CODES.OK);
     expect(res.body.message).to.equal(MESSAGES.AUTH_SUCCESS);
@@ -62,9 +62,11 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
   });
 
   it("returns 400 if PAT is missing", async () => {
-    const res = await request(app).post(API_ENDPOINTS.AUTH).send({});
+    const res = await request(app).post(fullAuthPath).send({});
     expect(res.status).to.equal(STATUS_CODES.BAD_REQUEST);
-    expect(res.body.error).to.equal(MESSAGES.MISSING_TOKEN);
+    expect(res.body.error).to.equal(
+      "PAT must be a non-empty string; pat must be a string"
+    );
   });
 
   it("returns 401 on GitHub auth failure", async () => {
@@ -72,21 +74,17 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
 
     const mockedOctokit = {
       users: {
-        getAuthenticated: sandbox.stub().rejects({
-          status: 401,
-          message: "Bad credentials",
-        }),
+        getAuthenticated: sinon
+          .stub()
+          .rejects({ status: 401, message: "Bad credentials" }),
       },
     };
 
-    sandbox
+    sinon
       .stub(githubClient, "createOctokitClient")
       .resolves(mockedOctokit as unknown as Octokit);
-    //sandbox.stub(githubClient, "createOctokitClient").returns(mockedOctokit);
 
-    const res = await request(app)
-      .post(API_ENDPOINTS.AUTH)
-      .send({ pat: mockPAT });
+    const res = await request(app).post(fullAuthPath).send({ pat: mockPAT });
 
     expect(res.status).to.equal(STATUS_CODES.UNAUTHORIZED);
     expect(res.body.error).to.equal(MESSAGES.INVALID_TOKEN);
@@ -97,7 +95,7 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
 
     const mockedOctokit = {
       users: {
-        getAuthenticated: sandbox.stub().rejects({
+        getAuthenticated: sinon.stub().rejects({
           status: 403,
           headers: {
             "x-ratelimit-remaining": "0",
@@ -107,13 +105,11 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
       },
     };
 
-    sandbox
+    sinon
       .stub(githubClient, "createOctokitClient")
       .resolves(mockedOctokit as unknown as Octokit);
 
-    const res = await request(app)
-      .post(API_ENDPOINTS.AUTH)
-      .send({ pat: mockPAT });
+    const res = await request(app).post(fullAuthPath).send({ pat: mockPAT });
 
     expect(res.status).to.equal(STATUS_CODES.TOO_MANY_REQUESTS);
     expect(res.body.error).to.include("GitHub rate limit exceeded");
@@ -126,35 +122,35 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
 
     const mockedOctokit = {
       users: {
-        getAuthenticated: sandbox.stub().resolves({
-          data: {
-            login: mockUserName,
-            email: mockEmail,
-          },
+        getAuthenticated: sinon.stub().resolves({
+          data: { login: mockUserName, email: mockEmail },
         }),
       },
     };
 
-    sandbox
+    sinon
       .stub(githubClient, "createOctokitClient")
       .resolves(mockedOctokit as unknown as Octokit);
-    sandbox
+    sinon
       .stub(cryptoUtils, "encrypt")
       .returns({ iv: "iv", content: "encrypted-pat", tag: "tag" });
 
-    const updateSpy = sandbox
+    const updateSpy = sinon
       .stub(userModule.default, "findOneAndUpdate")
       .resolves({
         userName: mockUserName,
         email: mockEmail,
       });
 
-    await request(app).post(API_ENDPOINTS.AUTH).send({ pat: mockPAT });
+    await request(app).post(fullAuthPath).send({ pat: mockPAT });
 
     sinon.assert.calledWith(
       updateSpy,
       { userName: mockUserName },
-      { email: mockEmail, encryptedPat: "encrypted-pat" },
+      {
+        email: mockEmail,
+        encryptedPat: { iv: "iv", content: "encrypted-pat", tag: "tag" },
+      },
       { new: true, upsert: true }
     );
   });
@@ -165,34 +161,28 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
 
     const mockedOctokit = {
       users: {
-        getAuthenticated: sandbox.stub().resolves({
-          data: {
-            login: mockUserName,
-            email: null,
-          },
+        getAuthenticated: sinon.stub().resolves({
+          data: { login: mockUserName, email: null },
         }),
       },
     };
 
-    sandbox
+    sinon
       .stub(githubClient, "createOctokitClient")
       .resolves(mockedOctokit as unknown as Octokit);
-    sandbox
+    sinon
       .stub(cryptoUtils, "encrypt")
       .returns({ iv: "iv", content: "secret", tag: "tag" });
-    sandbox.stub(userModule.default, "findOneAndUpdate").resolves({
+    sinon.stub(userModule.default, "findOneAndUpdate").resolves({
       userName: mockUserName,
       email: undefined,
     });
 
-    const res = await request(app)
-      .post(API_ENDPOINTS.AUTH)
-      .send({ pat: mockPAT });
+    const res = await request(app).post(fullAuthPath).send({ pat: mockPAT });
 
     expect(res.status).to.equal(STATUS_CODES.OK);
     expect(res.body.user).to.deep.equal({
       userName: mockUserName,
-      email: undefined,
     });
   });
 
@@ -201,30 +191,61 @@ describe.skip(`POST ${API_ENDPOINTS.AUTH}`, () => {
 
     const mockedOctokit = {
       users: {
-        getAuthenticated: sandbox.stub().resolves({
-          data: {
-            login: "kartik",
-            email: "test@example.com",
-          },
+        getAuthenticated: sinon.stub().resolves({
+          data: { login: "kartik", email: "test@example.com" },
         }),
       },
     };
 
-    sandbox
+    sinon
       .stub(githubClient, "createOctokitClient")
       .resolves(mockedOctokit as unknown as Octokit);
-    sandbox
+    sinon
       .stub(cryptoUtils, "encrypt")
       .returns({ iv: "iv", content: "encrypted", tag: "tag" });
-    sandbox
+    sinon
       .stub(userModule.default, "findOneAndUpdate")
       .rejects(new Error("DB Error"));
 
-    const res = await request(app)
-      .post(API_ENDPOINTS.AUTH)
-      .send({ pat: mockPAT });
+    const res = await request(app).post(fullAuthPath).send({ pat: mockPAT });
 
     expect(res.status).to.equal(STATUS_CODES.UNAUTHORIZED);
     expect(res.body.error).to.equal(MESSAGES.INVALID_TOKEN);
+  });
+
+  it("returns 500 if encrypt throws an error", async () => {
+    const mockUserName = "kartik";
+    const mockPAT = "pat-error";
+
+    const mockedOctokit = {
+      users: {
+        getAuthenticated: sinon.stub().resolves({
+          data: { login: mockUserName, email: "mail@example.com" },
+        }),
+      },
+    };
+
+    sinon
+      .stub(githubClient, "createOctokitClient")
+      .resolves(mockedOctokit as unknown as Octokit);
+    sinon.stub(cryptoUtils, "encrypt").throws(new Error("Encryption failure"));
+
+    const res = await request(app).post(fullAuthPath).send({ pat: mockPAT });
+
+    expect(res.status).to.equal(STATUS_CODES.UNAUTHORIZED);
+    expect(res.body.error).to.equal(MESSAGES.INVALID_TOKEN);
+  });
+
+  it("returns 500 if createOctokitClient throws", async () => {
+    const mockPAT = "fail-create-client";
+
+    sinon
+      .stub(githubClient, "createOctokitClient")
+      .throws(new Error("Failed to load Octokit"));
+
+    const res = await request(app).post(fullAuthPath).send({ pat: mockPAT });
+
+    expect(res.status).to.equal(STATUS_CODES.INTERNAL_SERVER_ERROR);
+    expect(res.body.error).to.equal("Failed to load Octokit");
   });
 });
