@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "GitHub PR Analytics API",
+    "version": "1.0.0",
+    "description": "API documentation for analyzing GitHub pull requests using authenticated PAT tokens."
+  },
+  "servers": [
+    {
+      "url": "https://gitSpector-2hx7.onrender.com/api"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth": {
+      "post": {
+        "summary": "Authenticate with GitHub PAT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authentication"
+          }
+        }
+      }
+    },
+    "/prs/analytics": {
+      "get": {
+        "summary": "Get developer PR analytics",
+        "parameters": [
+          {
+            "name": "developer",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PR analytics returned"
+          }
+        }
+      }
+    },
+    "/prs/{developer}/open": {
+      "get": {
+        "summary": "List open PRs by developer",
+        "parameters": [
+          {
+            "name": "developer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of open PRs"
+          }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/api/prs/CodeWithHarry/open?repo=Sigma-Web-Dev-Course&limit=1\" \\\n  -H \"Authorization: Bearer <TOKEN>\"\n```"
+      }
+    },
+    "/prs/metrics/{developer}": {
+      "get": {
+        "summary": "PR timing metrics",
+        "parameters": [
+          {
+            "name": "developer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PR timing insights"
+          }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/api/prs/metrics/whokartikgambhir\"\n```"
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Get all users",
+        "responses": {
+          "200": {
+            "description": "List of users"
+          }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/api/users\"\n```"
+      },
+      "post": {
+        "summary": "Create a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "409": {
+            "description": "User already exists"
+          }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X POST \"https://gitSpector-2hx7.onrender.com/api/users\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{ \"userName\": \"CodeWithHarry\" }'\n```"
+      }
+    },
+    "/user/{username}": {
+      "delete": {
+        "summary": "Delete user by username",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted"
+          }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X DELETE \"https://gitSpector-2hx7.onrender.com/api/users?userName=whokartiakgambhir\"\n```"
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "API is healthy"
+          }
+        },
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/health\"\n```"
+      }
+    }
+  }
+}
