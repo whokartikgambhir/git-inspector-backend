@@ -20,7 +20,7 @@ Authorization: Bearer <your-github-pat>
 
 ## 📍 Base URL
 
-**Live**: `https://github-pr-analytics-2hx7.onrender.com`
+**Live**: `https://gitSpector-2hx7.onrender.com`
 
 All endpoints are prefixed with `/api` except `/health`.
 
