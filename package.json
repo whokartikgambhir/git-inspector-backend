@@ -1,9 +1,9 @@
 {
-  "name": "github-pr-analytics",
+  "name": "gitSpector",
   "version": "1.0.0",
   "main": "index.js",
   "type": "commonjs",
-  "repository": "https://github.com/whokartikgambhir/github-pr-analytics.git",
+  "repository": "https://github.com/whokartikgambhir/gitSpector.git",
   "author": "whokartikgambhir <gambhirkartik6@gmail.com>",
   "license": "MIT",
   "dependencies": {

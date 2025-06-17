@@ -50,8 +50,8 @@ Authorization: Bearer <your-github-pat>
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/whokartikgambhir/github-pr-analytics.git
-cd github-pr-analytics
+git clone https://github.com/whokartikgambhir/gitSpector.git
+cd gitSpector
 yarn install
 ```
 
@@ -90,8 +90,8 @@ yarn start
 To build and run with Docker:
 
 ```bash
-docker build -t github-pr-analytics .
-docker run -p 3000:3000 --env-file .env github-pr-analytics
+docker build -t gitSpector .
+docker run -p 3000:3000 --env-file .env gitSpector
 ```
 
 ---
@@ -109,7 +109,7 @@ Generates a full test coverage report under `/coverage`.
 ## 📂 Project Structure
 
 ```
-github-pr-analytics/
+gitSpector/
 ├── src/
 │   ├── controllers/
 │   ├── routes/
