@@ -1,5 +1,7 @@
 # GitHub Inspector
 
+[![Deploy to Elastic Beanstalk](https://github.com/whokartikgambhir/git-inspector-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/whokartikgambhir/git-inspector-backend/actions)
+
 A production-ready backend API built with **Express.js**, **TypeScript** and **MongoDB** that integrates with the GitHub API to provide powerful pull request analytics.
 
 ---
