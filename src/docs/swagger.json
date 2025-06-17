@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://gitSpector-2hx7.onrender.com/api"
+      "url": "https://git-inspector-backend-2hx7.onrender.com/api"
     }
   ],
   "components": {
@@ -91,7 +91,7 @@
             "description": "List of open PRs"
           }
         },
-        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/api/prs/CodeWithHarry/open?repo=Sigma-Web-Dev-Course&limit=1\" \\\n  -H \"Authorization: Bearer <TOKEN>\"\n```"
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://git-inspector-backend-2hx7.onrender.com/api/prs/CodeWithHarry/open?repo=Sigma-Web-Dev-Course&limit=1\" \\\n  -H \"Authorization: Bearer <TOKEN>\"\n```"
       }
     },
     "/prs/metrics/{developer}": {
@@ -112,7 +112,7 @@
             "description": "PR timing insights"
           }
         },
-        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/api/prs/metrics/whokartikgambhir\"\n```"
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://git-inspector-backend-2hx7.onrender.com/api/prs/metrics/whokartikgambhir\"\n```"
       }
     },
     "/user": {
@@ -123,7 +123,7 @@
             "description": "List of users"
           }
         },
-        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/api/users\"\n```"
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://git-inspector-backend-2hx7.onrender.com/api/users\"\n```"
       },
       "post": {
         "summary": "Create a new user",
@@ -159,7 +159,7 @@
             "description": "User already exists"
           }
         },
-        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X POST \"https://gitSpector-2hx7.onrender.com/api/users\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{ \"userName\": \"CodeWithHarry\" }'\n```"
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X POST \"https://git-inspector-backend-2hx7.onrender.com/api/users\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{ \"userName\": \"CodeWithHarry\" }'\n```"
       }
     },
     "/user/{username}": {
@@ -180,7 +180,7 @@
             "description": "User deleted"
           }
         },
-        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X DELETE \"https://gitSpector-2hx7.onrender.com/api/users?userName=whokartiakgambhir\"\n```"
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X DELETE \"https://git-inspector-backend-2hx7.onrender.com/api/users?userName=whokartiakgambhir\"\n```"
       }
     },
     "/health": {
@@ -191,7 +191,7 @@
             "description": "API is healthy"
           }
         },
-        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://gitSpector-2hx7.onrender.com/health\"\n```"
+        "description": "### \ud83e\uddea Example curl\n```bash\ncurl -X GET \"https://git-inspector-backend-2hx7.onrender.com/health\"\n```"
       }
     }
   }
