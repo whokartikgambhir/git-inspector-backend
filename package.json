@@ -1,9 +1,9 @@
 {
-  "name": "gitSpector",
+  "name": "git-inspector-backend",
   "version": "1.0.0",
   "main": "index.js",
   "type": "commonjs",
-  "repository": "https://github.com/whokartikgambhir/gitSpector.git",
+  "repository": "https://github.com/whokartikgambhir/git-inspector-backend.git",
   "author": "whokartikgambhir <gambhirkartik6@gmail.com>",
   "license": "MIT",
   "dependencies": {

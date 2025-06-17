@@ -50,8 +50,8 @@ Authorization: Bearer <your-github-pat>
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/whokartikgambhir/gitSpector.git
-cd gitSpector
+git clone https://github.com/whokartikgambhir/git-inspector-backend.git
+cd git-inspector-backend
 yarn install
 ```
 
@@ -90,8 +90,8 @@ yarn start
 To build and run with Docker:
 
 ```bash
-docker build -t gitSpector .
-docker run -p 3000:3000 --env-file .env gitSpector
+docker build -t git-inspector-backend .
+docker run -p 3000:3000 --env-file .env git-inspector-backend
 ```
 
 ---
@@ -109,7 +109,7 @@ Generates a full test coverage report under `/coverage`.
 ## 📂 Project Structure
 
 ```
-gitSpector/
+git-inspector-backend/
 ├── src/
 │   ├── controllers/
 │   ├── routes/
