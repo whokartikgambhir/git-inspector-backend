@@ -79,6 +79,7 @@ function initHealthCheck(app: Application): void {
         uptime: process.uptime(),
         dbStatus,
         timestamp: new Date().toISOString(),
+        kartik: "gambhir"
       });
     } catch (error) {
       const err = error as APIError;
