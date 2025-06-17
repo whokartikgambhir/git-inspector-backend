@@ -1,4 +1,4 @@
-# GitHub PR Analytics API
+# GitHub Inspector
 
 A production-ready backend API built with **Express.js**, **TypeScript** and **MongoDB** that integrates with the GitHub API to provide powerful pull request analytics.
 

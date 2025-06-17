@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "GitHub PR Analytics API",
+    "title": "GitHub Inspector API",
     "version": "1.0.0",
     "description": "API documentation for analyzing GitHub pull requests using authenticated PAT tokens."
   },

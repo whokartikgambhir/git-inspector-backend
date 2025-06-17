@@ -1,6 +1,6 @@
 # API_DOCS.md
 
-## 📘 API Documentation – GitHub PR Analytics
+## 📘 API Documentation – GitHub Inspector
 
 This document outlines all available API endpoints, including parameters, authentication, and response structure.
 
