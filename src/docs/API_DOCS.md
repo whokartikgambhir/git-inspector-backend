@@ -1,6 +1,6 @@
 # API_DOCS.md
 
-## 📘 API Documentation – GitHub PR Analytics
+## 📘 API Documentation – GitHub Inspector
 
 This document outlines all available API endpoints, including parameters, authentication, and response structure.
 
@@ -20,7 +20,7 @@ Authorization: Bearer <your-github-pat>
 
 ## 📍 Base URL
 
-**Live**: `https://gitSpector-2hx7.onrender.com`
+**Live**: `https://git-inspector-backend-2hx7.onrender.com`
 
 All endpoints are prefixed with `/api` except `/health`.
 
