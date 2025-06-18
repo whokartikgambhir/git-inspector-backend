@@ -4,8 +4,8 @@ import { validate, ValidatorOptions } from 'class-validator';
 import { RequestHandler, Response, NextFunction } from 'express';
 
 // internal dependencies
-import { STATUS_CODES } from '../common/constants';
-import { ClassType, ValidatedRequest } from '../common/types';
+import { STATUS_CODES } from '../common/constants.js';
+import { ClassType, ValidatedRequest } from '../common/types.js';
 
 /**
  * Middleware to sanitize and validate request data against a DTO class

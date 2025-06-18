@@ -2,12 +2,12 @@
 import type { Request, Response, NextFunction } from "express";
 
 // internal dependencies
-import { createOctokitClient } from "../utils/githubClient";
-import User, { IUser } from "../models/user";
-import logger from "../utils/logger";
-import { encrypt } from "../utils/crypto";
-import { APIError } from "../common/types";
-import { STATUS_CODES, MESSAGES } from "../common/constants";
+import { createOctokitClient } from "../utils/githubClient.js";
+import User, { IUser } from "../models/user.js";
+import logger from "../utils/logger.js";
+import { encrypt } from "../utils/crypto.js";
+import { APIError } from "../common/types.js";
+import { STATUS_CODES, MESSAGES } from "../common/constants.js";
 
 /**
  * Validates the GitHub Personal Access Token (PAT), encrypts it and stores on user record

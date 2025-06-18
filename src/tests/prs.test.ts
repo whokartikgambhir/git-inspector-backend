@@ -7,7 +7,8 @@ import express, { Application, Response, NextFunction } from "express";
 
 // internal dependencies
 import * as prService from "../services/githubService";
-import { cache } from "../utils/cache";
+import redis from "../utils/redis";
+import { generateCacheKey } from "../utils/cache";
 import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants";
 import { AuthenticatedRequest, MappedPR } from "../common/types";
 
@@ -19,7 +20,9 @@ describe("PR API Endpoints", () => {
 
   let app: Application;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await redis.flushdb();
+
     const authenticateWithPATStub = (
       req: AuthenticatedRequest,
       _res: Response,
@@ -56,9 +59,9 @@ describe("PR API Endpoints", () => {
     app.use(API_ENDPOINTS.API, prRoutes.default);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     sinon.restore();
-    cache.flushAll();
+    await redis.flushdb();
   });
 
   it("should return open PRs for a valid developer", async () => {
@@ -146,12 +149,11 @@ describe("PR API Endpoints", () => {
   });
 
   it("should return cached open PRs if available", async () => {
-    const cacheKey = `openPRs:${JSON.stringify({
+    const cacheKey = generateCacheKey("openPRs", {
       developer: "mockuser",
       limit: 10,
-      page: 1,
-      repo: undefined,
-    })}`;
+      page: 1
+    });
 
     const cached = [
       {
@@ -160,7 +162,7 @@ describe("PR API Endpoints", () => {
         state: "open",
       },
     ];
-    cache.set(cacheKey, cached);
+    await redis.set(cacheKey, JSON.stringify(cached), "EX", 60);
 
     const res = await request(app)
       .get(openPrsEndpoint)

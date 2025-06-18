@@ -1,5 +1,5 @@
 // internal dependencies
-import { connectMongo } from "./config";
+import { connectMongo } from "./config.js";
 
 /**
  * Method to establish mongodb connection

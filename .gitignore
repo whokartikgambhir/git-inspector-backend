@@ -14,5 +14,7 @@ dist
 .vscode/
 .idea/
 
+# coverage
+# Code coverage reports
 coverage/
 .nyc_output/

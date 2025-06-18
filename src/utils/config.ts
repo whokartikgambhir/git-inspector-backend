@@ -3,7 +3,7 @@ import Joi from "joi";
 import mongoose from "mongoose";
 
 // internal dependencies
-import logger from "./logger";
+import logger from "./logger.js";
 
 // schema for expected environment variables
 const envSchema = Joi.object({
@@ -28,6 +28,10 @@ const envSchema = Joi.object({
   CORS_ORIGIN: Joi.string()
     .default("*")
     .messages({ "string.base": "CORS_ORIGIN must be a string" }),
+    
+  REDIS_URL: Joi.string().uri().default("redis://localhost:6379"),
+  
+  USE_REDIS_CACHE: Joi.boolean().default(false)
 }).unknown(true); // allow other env vars
 
 // Validate process.env against schema
@@ -51,6 +55,8 @@ export const config = {
   logLevel: envVars.LOG_LEVEL as string,
   githubBaseUrl: envVars.GITHUB_BASE_URL as string,
   corsOrigin: envVars.CORS_ORIGIN as string,
+  redisUrl: envVars.REDIS_URL as string,
+  useRedisCache: envVars.USE_REDIS_CACHE === 'true'
 };
 
 let _isConnected = false;

@@ -4,7 +4,7 @@ import "reflect-metadata";
 import express from "express";
 
 // internal dependencies
-import { bootstrap } from "./bootstrap";
+import { bootstrap } from "./bootstrap.js";
 
 const app = express();
 

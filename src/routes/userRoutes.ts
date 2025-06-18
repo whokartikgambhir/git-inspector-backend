@@ -2,11 +2,11 @@
 import express, { Router, Request, Response } from "express";
 
 // internal dependencies
-import User, { IUser } from "../models/user";
-import { APIError } from "../common/types";
-import { CreateUserDto } from "../common/dtos/user.dto";
-import { validateRequest } from "../middlewares/validateRequest";
-import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants";
+import User, { IUser } from "../models/user.js";
+import { APIError } from "../common/types.js";
+import { CreateUserDto } from "../common/dtos/user.dto.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants.js";
 
 const router: Router = express.Router();
 

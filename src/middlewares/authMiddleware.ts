@@ -1,9 +1,9 @@
 import { Response, NextFunction } from "express";
 
 // internal dependencies
-import { STATUS_CODES, MESSAGES } from "../common/constants";
-import { APIError, AuthenticatedRequest } from "../common/types";
-import logger from "../utils/logger";
+import { STATUS_CODES, MESSAGES } from "../common/constants.js";
+import { APIError, AuthenticatedRequest } from "../common/types.js";
+import logger from "../utils/logger.js";
 
 /**
  * Middleware to authenticate requests using GitHub Personal Access Token (PAT)

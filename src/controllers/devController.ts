@@ -2,16 +2,16 @@
 import type { Response } from "express";
 
 // internal dependencies
-import { cache, generateCacheKey } from "../utils/cache";
-import { APIError, AuthenticatedRequest, GitHubPR } from "../common/types";
-import { fetchDeveloperPRStats } from "../services/devService";
+import { generateCacheKey, getCache, setCache } from "../utils/cache.js";
+import { APIError, AuthenticatedRequest, GitHubPR, GitHubSearchResponse } from "../common/types.js";
+import { fetchDeveloperPRStats } from "../services/devService.js";
 import {
   STATUS_CODES,
   MESSAGES,
   GITHUB_STATES,
   DEFAULT_PAGINATION,
-} from "../common/constants";
-import logger from "../utils/logger";
+} from "../common/constants.js";
+import logger from "../utils/logger.js";
 
 /**
  * Controller to provide analytics for a developer's pull requests
@@ -57,15 +57,15 @@ export const getDeveloperAnalyticsController = async (
       page: pageNum,
       limit: limitNum,
     });
-    const cached = cache.get(cacheKey);
+    const cached = await getCache(cacheKey);
     if (cached) {
       res.status(STATUS_CODES.OK).json(cached);
-      logger.info("cached result");
+      logger.info("Cache HIT: devAnalytics");
       return;
     }
 
     // Fetch PR stats
-    const data = await fetchDeveloperPRStats(developer, user.token);
+    const data = await fetchDeveloperPRStats(developer, user.token) as GitHubSearchResponse;
 
     let open = 0;
     let closed = 0;
@@ -126,7 +126,7 @@ export const getDeveloperAnalyticsController = async (
     };
 
     // Store in cache
-    cache.set(cacheKey, result, 60);
+    await setCache(cacheKey, result, 300); // 5 min TTL
 
     res.status(STATUS_CODES.OK).json(result);
   } catch (error) {
