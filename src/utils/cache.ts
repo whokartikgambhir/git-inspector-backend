@@ -1,6 +1,6 @@
 // internal dependencies
-import redis from "./redis";
-import { config } from "./config";
+import redis from "./redis.js";
+import { config } from "./config.js";
 
 /**
  * Sets a value in Redis with TTL (in seconds)

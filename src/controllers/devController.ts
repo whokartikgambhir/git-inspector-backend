@@ -2,16 +2,16 @@
 import type { Response } from "express";
 
 // internal dependencies
-import { generateCacheKey, getCache, setCache } from "../utils/cache";
-import { APIError, AuthenticatedRequest, GitHubPR, GitHubSearchResponse } from "../common/types";
-import { fetchDeveloperPRStats } from "../services/devService";
+import { generateCacheKey, getCache, setCache } from "../utils/cache.js";
+import { APIError, AuthenticatedRequest, GitHubPR, GitHubSearchResponse } from "../common/types.js";
+import { fetchDeveloperPRStats } from "../services/devService.js";
 import {
   STATUS_CODES,
   MESSAGES,
   GITHUB_STATES,
   DEFAULT_PAGINATION,
-} from "../common/constants";
-import logger from "../utils/logger";
+} from "../common/constants.js";
+import logger from "../utils/logger.js";
 
 /**
  * Controller to provide analytics for a developer's pull requests

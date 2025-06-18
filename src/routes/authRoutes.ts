@@ -2,10 +2,10 @@
 import express, { Router } from "express";
 
 // internal dependencies
-import { API_ENDPOINTS } from "../common/constants";
-import { validateGitHubPAT } from "../controllers/authController";
-import { ValidateAuthDto } from "../common/dtos/auth.dto";
-import { validateRequest } from "../middlewares/validateRequest";
+import { API_ENDPOINTS } from "../common/constants.js";
+import { validateGitHubPAT } from "../controllers/authController.js";
+import { ValidateAuthDto } from "../common/dtos/auth.dto.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
 
 const router: Router = express.Router();
 

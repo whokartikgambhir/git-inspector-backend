@@ -1,5 +1,5 @@
 // internal dependencies
-import { cachedGitHubRequest } from "../utils/githubClient";
+import { cachedGitHubRequest } from "../utils/githubClient.js";
 
 /**
  * Fetches pull request statistics for a given developer from the GitHub API

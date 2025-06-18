@@ -1,28 +1,28 @@
 // external dependencies
 import swaggerUi from "swagger-ui-express";
-import * as swaggerDocument from "./docs/swagger.json";
+import swaggerDocument from "./docs/swagger.json" assert { type: "json" };
 import helmet from "helmet";
 import cors from "cors";
 import mongoose from "mongoose";
 import express, { Application, Request, Response } from "express";
 
 // internal dependencies
-import logger from "./utils/logger";
-import { connect } from "./utils/db";
-import { config } from "./utils/config";
-import prRoutes from "./routes/prRoutes";
-import devRoutes from "./routes/devRoutes";
-import authRoutes from "./routes/authRoutes";
-import userRoutes from "./routes/userRoutes";
-import { apiRateLimiter } from "./utils/rateLimiter";
-import { errorHandler } from "./middlewares/errorHandler";
+import logger from "./utils/logger.js";
+import { connect } from "./utils/db.js";
+import { config } from "./utils/config.js";
+import prRoutes from "./routes/prRoutes.js";
+import devRoutes from "./routes/devRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import { apiRateLimiter } from "./utils/rateLimiter.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 import {
   API_ENDPOINTS,
   DB_STATES,
   MESSAGES,
   STATUS_CODES,
-} from "./common/constants";
-import { APIError } from "./common/types";
+} from "./common/constants.js";
+import { APIError } from "./common/types.js";
 
 /**
  * Initializes global middlewares

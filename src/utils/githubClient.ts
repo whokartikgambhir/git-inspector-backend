@@ -2,10 +2,10 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // internal dependencies
-import redis from "../utils/redis";
-import { config } from "./config";
-import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants";
-import { APIError } from "../common/types";
+import redis from "../utils/redis.js";
+import { config } from "./config.js";
+import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants.js";
+import { APIError } from "../common/types.js";
 
 /**
  * Dynamically imports and creates an authenticated GitHub Octokit client
