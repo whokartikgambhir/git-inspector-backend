@@ -2,7 +2,6 @@
   "name": "git-inspector-backend",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "repository": "https://github.com/whokartikgambhir/git-inspector-backend.git",
   "author": "whokartikgambhir <gambhirkartik6@gmail.com>",
   "license": "MIT",

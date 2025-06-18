@@ -1,6 +1,6 @@
 // external dependencies
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "./docs/swagger.json" assert { type: "json" };
+import swaggerDocument from "./docs/swagger.json";
 import helmet from "helmet";
 import cors from "cors";
 import mongoose from "mongoose";
