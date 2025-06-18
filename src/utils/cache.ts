@@ -1,6 +1,8 @@
 // internal dependencies
 import redis from "./redis.js";
-import { config } from "./config.js";
+import "dotenv/config";
+
+const useRedisCache = process.env.USE_REDIS_CACHE;
 
 /**
  * Sets a value in Redis with TTL (in seconds)
@@ -15,8 +17,9 @@ export async function setCache<T>(
   value: T,
   ttlSec: number = 60
 ): Promise<void> {
-  if (!config.useRedisCache) return;
+  if (useRedisCache == "false") return;
   await redis.set(key, JSON.stringify(value), "EX", ttlSec);
+   console.log(`[CACHE SET] ${key}`);
 }
 
 /**
@@ -26,9 +29,15 @@ export async function setCache<T>(
  * @returns {Promise<T | null>} - Parsed object or null if not found
  */
 export async function getCache<T>(key: string): Promise<T | null> {
-  if (!config.useRedisCache) return null;
-  const raw = await redis.get(key);
-  return raw ? (JSON.parse(raw) as T) : null;
+  if (useRedisCache == "false") return null;
+  const cached = await redis.get(key);
+  if (cached) {
+    console.log(`[CACHE HIT] ${key}`);
+    return JSON.parse(cached);
+  } else {
+    console.log(`[CACHE MISS] ${key}`);
+    return null;
+  }
 }
 
 /**
@@ -37,7 +46,7 @@ export async function getCache<T>(key: string): Promise<T | null> {
  * @returns {Promise<void>}
  */
 export async function delCache(key: string): Promise<void> {
-  if (!config.useRedisCache) return;
+  if (useRedisCache == "false") return;
   await redis.del(key);
 }
 

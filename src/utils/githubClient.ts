@@ -1,11 +1,13 @@
 // external dependencies
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import "dotenv/config";
 
 // internal dependencies
 import redis from "../utils/redis.js";
-import { config } from "./config.js";
 import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants.js";
 import { APIError } from "../common/types.js";
+
+const useRedisCache = process.env.USE_REDIS_CACHE;
 
 /**
  * Dynamically imports and creates an authenticated GitHub Octokit client
@@ -58,7 +60,7 @@ export const cachedGitHubRequest = async <T>(
     Accept: "application/vnd.github+json",
   };
 
-  if (config.useRedisCache) {
+  if (useRedisCache == "true") {
     const cachedETag = await redis.get(etagKey);
     if (cachedETag) headers["If-None-Match"] = cachedETag;
   }
@@ -67,7 +69,7 @@ export const cachedGitHubRequest = async <T>(
     const response: AxiosResponse<T> = await axios.get<T>(url, { headers });
     const newETag = response.headers.etag;
 
-    if (config.useRedisCache) {
+    if (useRedisCache == "true") {
       await redis.set(cacheKey, JSON.stringify(response.data), "EX", 300); // 5 min TTL
       if (newETag) await redis.set(etagKey, newETag);
     }
@@ -75,7 +77,7 @@ export const cachedGitHubRequest = async <T>(
     return response.data;
   } catch (error) {
     const err = error as APIError;
-    if (err.response?.status === 304 && config.useRedisCache) {
+    if (err.response?.status === 304 && useRedisCache) {
       const fallback = await redis.get(cacheKey);
       if (fallback) return JSON.parse(fallback) as T;
     }
