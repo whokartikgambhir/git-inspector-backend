@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "rootDir": "./src",
     "resolveJsonModule": true,
@@ -11,7 +11,6 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "isolatedModules": true,
     "types": ["mocha", "node"]
   },
   "include": ["src/**/*"],
