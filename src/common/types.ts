@@ -10,6 +10,9 @@ export interface APIError extends Error {
   headers: IncomingHttpHeaders & {
     authorization?: string;
   };
+  response?: {
+    status: number;
+  }
 }
 
 // interface for authenticated requests
@@ -43,6 +46,12 @@ export interface GitHubPR {
   state: string;
   html_url: string;
   pull_request?: { merged_at: string | null };
+}
+
+export interface GitHubSearchResponse {
+  total_count: number;
+  incomplete_results: boolean;
+  items: GitHubPR[];
 }
 
 // interface for standardize the structure of PRs

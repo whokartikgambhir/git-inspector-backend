@@ -7,7 +7,8 @@ import express, { Application, Response, NextFunction } from "express";
 
 // internal dependencies
 import * as devService from "../services/devService";
-import { cache } from "../utils/cache";
+import redis from "../utils/redis";
+import { generateCacheKey } from "../utils/cache";
 import { API_ENDPOINTS, STATUS_CODES, MESSAGES } from "../common/constants";
 import { AuthenticatedRequest } from "../common/types";
 
@@ -18,7 +19,8 @@ describe(`GET ${API_ENDPOINTS.PRS.ANALYTICS}`, () => {
 
   let app: Application;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await redis.flushdb();
     // Stub all middleware used in the route
     const authenticateWithPATStub = (
       req: AuthenticatedRequest,
@@ -57,9 +59,9 @@ describe(`GET ${API_ENDPOINTS.PRS.ANALYTICS}`, () => {
     app.use(API_ENDPOINTS.API, devRoutes.default);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     sinon.restore();
-    cache.flushAll();
+    await redis.flushdb();
   });
 
   it("returns developer analytics with valid token", async () => {
@@ -126,12 +128,12 @@ describe(`GET ${API_ENDPOINTS.PRS.ANALYTICS}`, () => {
 
   it("returns cached result if available", async () => {
     const mockResponse = { developer: mockDeveloper, totalPRs: 5 };
-    const cacheKey = `devAnalytics:${JSON.stringify({
+    const cacheKey = generateCacheKey("devAnalytics", {
       developer: mockDeveloper,
       limit: 10,
-      page: 1,
-    })}`;
-    cache.set(cacheKey, mockResponse);
+      page: 1
+    });
+    await redis.set(cacheKey, JSON.stringify(mockResponse), "EX", 60);
 
     const res = await request(app)
       .get(devAnalyticsEndpoint)

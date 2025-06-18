@@ -1,6 +1,6 @@
 // external dependencies
 import type { Response } from "express";
-import { cache, generateCacheKey } from "../utils/cache";
+import { getCache, setCache, generateCacheKey } from "../utils/cache";
 
 // internal dependencies
 import {
@@ -61,7 +61,7 @@ export const getOpenPRsController = async (
       page: pageNum,
       limit: limitNum,
     });
-    const cached = cache.get(cacheKey);
+    const cached = await getCache(cacheKey);
     if (cached) {
       res
         .status(STATUS_CODES.OK)
@@ -80,7 +80,7 @@ export const getOpenPRsController = async (
     );
 
     // Cache the paginated result
-    cache.set(cacheKey, paginated, 60);
+    await setCache(cacheKey, paginated, 300); // 5 min TTL
 
     res.status(STATUS_CODES.OK).json({ prs: paginated, total: allPRs.length });
   } catch (error) {
@@ -131,10 +131,10 @@ export const getPRTimingMetricsController = async (
   try {
     // Generate cache key
     const cacheKey = generateCacheKey("prMetrics", { developer });
-    const cached = cache.get(cacheKey);
+    const cached = await getCache(cacheKey);
     if (cached) {
       res.status(STATUS_CODES.OK).json(cached);
-      logger.info("cached result");
+      logger.info("cache HIT: prMetrics");
       return;
     }
 
@@ -183,7 +183,7 @@ export const getPRTimingMetricsController = async (
     };
 
     // Cache metrics
-    cache.set(cacheKey, result, 60);
+    await setCache(cacheKey, result, 300); // 5 min TTL
 
     res.status(STATUS_CODES.OK).json(result);
   } catch (error) {

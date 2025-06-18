@@ -1,8 +1,11 @@
 // external dependencies
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // internal dependencies
+import redis from "../utils/redis";
+import { config } from "./config";
 import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants";
+import { APIError } from "../common/types";
 
 /**
  * Dynamically imports and creates an authenticated GitHub Octokit client
@@ -33,4 +36,49 @@ export const githubClient = (token: string): AxiosInstance => {
       ...GITHUB_API_HEADERS,            // add default GitHub API headers
     },
   });
+};
+
+/**
+ * Makes a cached GET request to the GitHub API with ETag-based validation
+ *
+ * @template T
+ * @param {string} url - GitHub API endpoint
+ * @param {string} token - GitHub Personal Access Token for authentication
+ * @returns {Promise<T>} - Parsed JSON response, either fresh or from Redis fallback
+ */
+export const cachedGitHubRequest = async <T>(
+  url: string,
+  token: string
+): Promise<T> => {
+  const cacheKey = `github:${url}`;
+  const etagKey = `${cacheKey}:etag`;
+
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github+json",
+  };
+
+  if (config.useRedisCache) {
+    const cachedETag = await redis.get(etagKey);
+    if (cachedETag) headers["If-None-Match"] = cachedETag;
+  }
+
+  try {
+    const response: AxiosResponse<T> = await axios.get<T>(url, { headers });
+    const newETag = response.headers.etag;
+
+    if (config.useRedisCache) {
+      await redis.set(cacheKey, JSON.stringify(response.data), "EX", 300); // 5 min TTL
+      if (newETag) await redis.set(etagKey, newETag);
+    }
+
+    return response.data;
+  } catch (error) {
+    const err = error as APIError;
+    if (err.response?.status === 304 && config.useRedisCache) {
+      const fallback = await redis.get(cacheKey);
+      if (fallback) return JSON.parse(fallback) as T;
+    }
+    throw err;
+  }
 };

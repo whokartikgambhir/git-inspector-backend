@@ -30,6 +30,7 @@ export const authenticateWithPAT = async (
     // 💡 Dynamically import Octokit to support ESM in CommonJS
     const { Octokit } = await import("@octokit/rest");
     const octokit = new Octokit({ auth: pat });
+    console.log("att", pat);
 
     const { data } = await octokit.users.getAuthenticated();
 
@@ -41,6 +42,7 @@ export const authenticateWithPAT = async (
     next();
   } catch (error) {
     const err = error as APIError;
+    console.log("e", error);
     logger.error("GitHub PAT authentication failed:", err.message);
     res.status(STATUS_CODES.UNAUTHORIZED).json({ error: MESSAGES.INVALID_TOKEN });
   }

@@ -13,3 +13,8 @@ dist
 # IDE specific files
 .vscode/
 .idea/
+
+# coverage
+# Code coverage reports
+coverage/
+.nyc_output/
