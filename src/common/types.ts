@@ -73,3 +73,21 @@ export interface ValidatedRequest<T> extends Request {
 
 // generic type for DTO class constructor
 export type ClassType<T extends object> = { new (...args: unknown[]): T };
+
+export interface LongestPR {
+  title: string;
+  url: string;
+  duration: string;
+}
+
+export interface DeveloperPRStats {
+  username: string;
+  totalPRs: number;
+  openPRs: number;
+  closedPRs: number;
+  mergedPRs: number;
+  avgMergeTime: string | null;
+  longestOpenPR: LongestPR | null;
+  score: number;
+  grade: string;
+}

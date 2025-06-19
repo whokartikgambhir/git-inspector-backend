@@ -8,6 +8,7 @@ import { authenticateWithPAT } from "../middlewares/authMiddleware.js";
 import {
   getOpenPRsController,
   getPRTimingMetricsController,
+  compareDevelopersHandler,
 } from "../controllers/prController.js";
 import { GetPrsDto, GetMetricsDto } from "../common/dtos/pr.dto.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
@@ -32,6 +33,13 @@ router.get(
   validateRequest(GetMetricsDto),
   checkUserExists,
   getPRTimingMetricsController
+);
+
+// GET route for comparing developer PR metrics
+router.get(
+  API_ENDPOINTS.PRS.COMPARE,
+  authenticateWithPAT,
+  compareDevelopersHandler
 );
 
 export default router;
