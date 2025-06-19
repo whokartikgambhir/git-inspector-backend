@@ -90,4 +90,5 @@ export interface DeveloperPRStats {
   longestOpenPR: LongestPR | null;
   score: number;
   grade: string;
+  successRate: string;
 }

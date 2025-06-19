@@ -5,7 +5,7 @@ import axiosRetry from "axios-retry";
 import CircuitBreaker from "opossum";
 
 // internal dependencies
-import redis from "../utils/redis.js";
+import redis from "./redis.js";
 import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants.js";
 import { APIError } from "../common/types.js";
 import logger from "./logger.js";

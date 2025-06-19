@@ -12,6 +12,8 @@ import {
   APIError,
   AuthenticatedRequest,
   DeveloperPRStats,
+  GitHubPR,
+  GitHubSearchResponse,
   MappedPR,
 } from "../common/types.js";
 import {
@@ -21,6 +23,7 @@ import {
   DEFAULT_PAGINATION,
 } from "../common/constants.js";
 import logger from "../utils/logger.js";
+import { fetchDeveloperPRStats } from "../services/devService.js";
 
 /**
  * GET /prs/:developer/open - Get open PRs for a developer
@@ -260,48 +263,65 @@ export const compareDevelopersHandler = async (
   const token = user.token;
 
   try {
-    const [aPRs, bPRs] = await Promise.all([
+    const [aStatsRaw, bStatsRaw, aAllPRs, bAllPRs] = await Promise.all([
+      fetchDeveloperPRStats(devA, token),
+      fetchDeveloperPRStats(devB, token),
       fetchAllPullRequestsForUser(devA, token),
       fetchAllPullRequestsForUser(devB, token),
     ]);
 
-    const computeDeveloperStats = (prs: MappedPR[], username: string): DeveloperPRStats => {
-      let open = 0, closed = 0, merged = 0;
-      const durations: number[] = [];
+    const formatStats = (dev: string, statsRaw: GitHubSearchResponse, allPRs: MappedPR[]) => {
+      let open = 0;
+      let closed = 0;
+      let merged = 0;
+      const mergeTimes: number[] = [];
       const now = Date.now();
 
-      for (const pr of prs) {
+      for (const pr of statsRaw.items as GitHubPR[]) {
         const isOpen = pr.state === GITHUB_STATES.OPEN;
-        const isMerged = pr.closedAt && pr.state === GITHUB_STATES.CLOSED;
+        const isMerged = pr.pull_request?.merged_at != null;
         const isClosed = pr.state === GITHUB_STATES.CLOSED && !isMerged;
 
         if (isOpen) open++;
         if (isMerged) {
           merged++;
-          durations.push(new Date(pr.closedAt!).getTime() - new Date(pr.createdAt).getTime());
+          mergeTimes.push(
+            new Date(pr.pull_request!.merged_at!).getTime() -
+              new Date(pr.created_at).getTime()
+          );
         }
         if (isClosed) closed++;
       }
 
-      const avgMergeTime = durations.length
-        ? formatExtendedDuration(durations.reduce((a, b) => a + b, 0) / durations.length)
+      const averageMergeTime = mergeTimes.length
+        ? formatExtendedDuration(
+            mergeTimes.reduce((a, b) => a + b, 0) / mergeTimes.length
+          )
         : null;
 
-      const longestOpen = prs
-        .filter(pr => pr.state === GITHUB_STATES.OPEN)
-        .map(pr => ({
+      const successRate =
+        merged + closed > 0 ? (merged / (merged + closed)) * 100 : 0;
+
+      const longestOpen = allPRs
+        .filter((pr) => pr.state === GITHUB_STATES.OPEN)
+        .map((pr) => ({
           ...pr,
-          openDuration: now - new Date(pr.createdAt).getTime()
+          openDuration: now - new Date(pr.createdAt).getTime(),
         }))
         .sort((a, b) => b.openDuration - a.openDuration)[0];
 
-      const stats: DeveloperPRStats = {
-        username,
-        totalPRs: prs.length,
+      const score = merged * 5 + closed * 2 + open;
+      const grade =
+        score > 80 ? "S" : score > 60 ? "A" : score > 40 ? "B" : "C";
+
+      const result: DeveloperPRStats = {
+        username: dev,
+        totalPRs: statsRaw.total_count,
         openPRs: open,
         closedPRs: closed,
         mergedPRs: merged,
-        avgMergeTime,
+        avgMergeTime: averageMergeTime,
+        successRate: `${successRate.toFixed(2)}%`,
         longestOpenPR: longestOpen
           ? {
               title: longestOpen.title,
@@ -309,18 +329,15 @@ export const compareDevelopersHandler = async (
               duration: formatExtendedDuration(longestOpen.openDuration),
             }
           : null,
-        score: 0,
-        grade: "",
+        score,
+        grade,
       };
 
-      stats.score = merged * 5 + closed * 2 + open;
-      stats.grade = stats.score > 80 ? "S" : stats.score > 60 ? "A" : stats.score > 40 ? "B" : "C";
-
-      return stats;
+      return result;
     };
 
-    const devAStats = computeDeveloperStats(aPRs, devA);
-    const devBStats = computeDeveloperStats(bPRs, devB);
+    const devAStats = formatStats(devA, aStatsRaw as GitHubSearchResponse, aAllPRs);
+    const devBStats = formatStats(devB, bStatsRaw as GitHubSearchResponse, bAllPRs);
     const leaderboard = [devAStats, devBStats].sort((a, b) => b.score - a.score);
 
     res.status(STATUS_CODES.OK).json({ leaderboard });
