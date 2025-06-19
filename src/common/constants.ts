@@ -62,7 +62,8 @@ export const API_ENDPOINTS = Object.freeze({
   PRS: Object.freeze({
     OPEN: "/prs/:developer/open",
     METRICS: "/prs/metrics/:developer",
-    ANALYTICS: "/prs/analytics"
+    ANALYTICS: "/prs/analytics",
+    COMPARE: "/prs/compare/:devA/:devB"
   }),
   USER: "/users",
   SEARCH: Object.freeze({

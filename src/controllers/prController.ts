@@ -8,7 +8,7 @@ import {
   fetchOpenPullRequestsForAllRepos,
   fetchAllPullRequestsForUser,
 } from "../services/githubService.js";
-import { APIError, AuthenticatedRequest } from "../common/types.js";
+import { APIError, AuthenticatedRequest, DeveloperPRStats, MappedPR } from "../common/types.js";
 import {
   STATUS_CODES,
   MESSAGES,
@@ -236,4 +236,96 @@ const formatExtendedDuration = (ms: number): string => {
   if (seconds) parts.push(`${seconds} secs`);
 
   return parts.join(", ");
+};
+
+export const compareDevelopersHandler = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const { devA, devB } = req.params;
+  const { repo, state } = req.query;
+  const user = req.user;
+
+  if (!user || !user.token) {
+    res
+      .status(STATUS_CODES.UNAUTHORIZED)
+      .json({ error: MESSAGES.UNAUTHORIZED_USER });
+    return;
+  }
+
+  const token = user.token;
+
+  try {
+    const [aPRs, bPRs] = await Promise.all([
+      fetchAllPullRequestsForUser(devA, token),
+      fetchAllPullRequestsForUser(devB, token),
+    ]);
+
+    const now = new Date().getTime();
+
+    const filterPRs = (prs: MappedPR[]) => {
+      return prs.filter(pr => {
+        if (repo && !pr.repo?.includes(repo as string)) return false;
+        if (state && pr.state !== state) return false;
+        return true;
+      });
+    };
+
+    const calculateStats = (prs: MappedPR[], username: string) => {
+      const filtered = filterPRs(prs);
+      const stats: DeveloperPRStats = {
+        username,
+        totalPRs: filtered.length,
+        openPRs: filtered.filter(pr => pr.state === GITHUB_STATES.OPEN).length,
+        closedPRs: filtered.filter(pr => pr.state === GITHUB_STATES.CLOSED).length,
+        mergedPRs: filtered.filter(pr => pr.state === GITHUB_STATES.MERGED).length,
+        avgMergeTime: null,
+        longestOpenPR: null,
+        score: 0,
+        grade: ""
+      };
+
+      const closedDurations = filtered
+        .filter(pr => pr.state !== GITHUB_STATES.OPEN && pr.closedAt)
+        .map(pr => new Date(pr.closedAt as string).getTime() - new Date(pr.createdAt).getTime());
+
+      if (closedDurations.length) {
+        const avgMs = closedDurations.reduce((a, b) => a + b, 0) / closedDurations.length;
+        stats.avgMergeTime = formatExtendedDuration(avgMs);
+      }
+
+      const longestOpen = filtered
+        .filter(pr => pr.state === GITHUB_STATES.OPEN)
+        .map(pr => ({
+          ...pr,
+          openDuration: now - new Date(pr.createdAt).getTime()
+        }))
+        .sort((a, b) => b.openDuration - a.openDuration)[0];
+
+      if (longestOpen) {
+        stats.longestOpenPR = {
+          title: longestOpen.title,
+          url: longestOpen.pr,
+          duration: formatExtendedDuration(longestOpen.openDuration)
+        };
+      }
+
+      // Simple scoring system
+      stats.score = (stats.mergedPRs * 5 + stats.closedPRs * 2 + stats.openPRs);
+      stats.grade = stats.score > 80 ? "S" : stats.score > 60 ? "A" : stats.score > 40 ? "B" : "C";
+
+      return stats;
+    };
+
+    const devAStats = calculateStats(aPRs, devA);
+    const devBStats = calculateStats(bPRs, devB);
+
+    const leaderboard = [devAStats, devBStats].sort((a, b) => b.score - a.score);
+
+    res.status(STATUS_CODES.OK).json({ leaderboard });
+  } catch (error) {
+    const err = error as APIError;
+    logger.error("Compare Handler Error:", err.message);
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message });
+  }
 };
