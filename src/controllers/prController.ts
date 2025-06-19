@@ -294,10 +294,15 @@ export const compareDevelopersHandler = async (
       }
 
       const averageMergeTime = mergeTimes.length
-        ? formatExtendedDuration(
-            mergeTimes.reduce((a, b) => a + b, 0) / mergeTimes.length
-          )
-        : null;
+      ? (() => {
+          const avgMs =
+            mergeTimes.reduce((sum, t) => sum + t, 0) / mergeTimes.length;
+          const hrs = Math.floor(avgMs / 3600000);
+          const mins = Math.floor((avgMs % 3600000) / 60000);
+          const secs = Math.floor((avgMs % 60000) / 1000);
+          return `${hrs} hr: ${mins} min: ${secs} sec`;
+        })()
+      : null;
 
       const successRate =
         merged + closed > 0 ? (merged / (merged + closed)) * 100 : 0;
