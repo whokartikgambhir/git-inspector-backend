@@ -8,6 +8,7 @@ import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants.js"
 import { APIError } from "../common/types.js";
 
 const useRedisCache = process.env.USE_REDIS_CACHE;
+console.log("2. use redis cache", useRedisCache);
 
 /**
  * Dynamically imports and creates an authenticated GitHub Octokit client

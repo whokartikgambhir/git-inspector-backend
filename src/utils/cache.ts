@@ -3,6 +3,7 @@ import redis from "./redis.js";
 import "dotenv/config";
 
 const useRedisCache = process.env.USE_REDIS_CACHE;
+console.log("1. use redis cache", useRedisCache);
 
 /**
  * Sets a value in Redis with TTL (in seconds)
