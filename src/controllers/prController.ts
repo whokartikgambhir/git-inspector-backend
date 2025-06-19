@@ -315,14 +315,14 @@ export const compareDevelopersHandler = async (
         score > 80 ? "S" : score > 60 ? "A" : score > 40 ? "B" : "C";
 
       const result: DeveloperPRStats = {
-        username: dev,
+        developer: dev,
         totalPRs: statsRaw.total_count,
         openPRs: open,
         closedPRs: closed,
         mergedPRs: merged,
-        avgMergeTime: averageMergeTime,
+        averageMergeTime,
         successRate: `${successRate.toFixed(2)}%`,
-        longestOpenPR: longestOpen
+        longestRunningOpenPRs: longestOpen
           ? {
               title: longestOpen.title,
               url: longestOpen.pr,

@@ -81,13 +81,13 @@ export interface LongestPR {
 }
 
 export interface DeveloperPRStats {
-  username: string;
+  developer: string;
   totalPRs: number;
   openPRs: number;
   closedPRs: number;
   mergedPRs: number;
-  avgMergeTime: string | null;
-  longestOpenPR: LongestPR | null;
+  averageMergeTime: string | null;
+  longestRunningOpenPRs: LongestPR | null;
   score: number;
   grade: string;
   successRate: string;
