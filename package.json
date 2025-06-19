@@ -25,6 +25,7 @@
     "@types/supertest": "^6.0.3",
     "@types/winston": "^2.4.4",
     "axios": "^1.9.0",
+    "axios-retry": "^4.5.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cors": "^2.8.5",
@@ -37,12 +38,14 @@
     "joi": "^17.13.3",
     "mongoose": "^8.15.1",
     "node-cache": "^5.1.2",
+    "opossum": "^9.0.0",
     "reflect-metadata": "^0.2.2",
     "swagger-ui-express": "^5.0.1",
     "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
+    "@types/opossum": "^8.1.8",
     "@types/swagger-ui-express": "^4.1.8",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",

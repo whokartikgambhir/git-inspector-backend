@@ -1,13 +1,74 @@
 // external dependencies
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import "dotenv/config";
+import axiosRetry from "axios-retry";
+import CircuitBreaker from "opossum";
 
 // internal dependencies
 import redis from "../utils/redis.js";
 import { GITHUB_API_BASE_URL, GITHUB_API_HEADERS } from "../common/constants.js";
 import { APIError } from "../common/types.js";
+import logger from "./logger.js";
 
 const useRedisCache = process.env.USE_REDIS_CACHE;
+
+// Configure axios instance with retry logic
+const createRetriableAxiosInstance = (token: string): AxiosInstance => {
+  if (!token) throw new Error("GitHub token is required for API requests.");
+
+  const instance = axios.create({
+    baseURL: GITHUB_API_BASE_URL,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...GITHUB_API_HEADERS,
+    },
+  });
+
+  axiosRetry(instance, {
+    retries: 3,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (error) => {
+      return (
+        axiosRetry.isNetworkOrIdempotentRequestError(error) ||
+        [403, 429, 503].includes(error?.response?.status as number)
+      );
+    },
+  });
+
+  return instance;
+};
+
+// Circuit breaker wrapper for GitHub API requests
+const breakerOptions = {
+  timeout: 10000,
+  errorThresholdPercentage: 50,
+  resetTimeout: 30000,
+};
+
+const githubRequestBreaker = new CircuitBreaker(
+  async (url: string, token: string) => {
+    const client = createRetriableAxiosInstance(token);
+    const response: AxiosResponse = await client.get(url);
+    return response.data;
+  },
+  breakerOptions
+);
+
+githubRequestBreaker.fallback(async (url: string) => {
+  if (useRedisCache === "true") {
+    const cached = await redis.get(`github:${url}`);
+    if (cached) {
+      logger.warn("Serving GitHub fallback from Redis for:", url);
+      return JSON.parse(cached);
+    }
+  }
+  logger.error("No fallback available for:", url);
+  return null;
+});
+
+githubRequestBreaker.on("open", () => logger.warn("GitHub circuit breaker: OPEN"));
+githubRequestBreaker.on("halfOpen", () => logger.info("GitHub circuit breaker: HALF-OPEN"));
+githubRequestBreaker.on("close", () => logger.info("GitHub circuit breaker: CLOSED"));
 
 /**
  * Dynamically imports and creates an authenticated GitHub Octokit client
@@ -28,16 +89,7 @@ export const createOctokitClient = async (pat: string) => {
  * @throws error if token is missing
  */
 export const githubClient = (token: string): AxiosInstance => {
-  if (!token) {
-    throw new Error("GitHub token is required for API requests.");
-  }
-  return axios.create({
-    baseURL: GITHUB_API_BASE_URL,
-    headers: {
-      Authorization: `Bearer ${token}`, // set PAT for authentication
-      ...GITHUB_API_HEADERS,            // add default GitHub API headers
-    },
-  });
+  return createRetriableAxiosInstance(token);
 };
 
 /**
@@ -52,35 +104,15 @@ export const cachedGitHubRequest = async <T>(
   url: string,
   token: string
 ): Promise<T> => {
-  const cacheKey = `github:${url}`;
-  const etagKey = `${cacheKey}:etag`;
-
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${token}`,
-    Accept: "application/vnd.github+json",
-  };
-
-  if (useRedisCache == "true") {
-    const cachedETag = await redis.get(etagKey);
-    if (cachedETag) headers["If-None-Match"] = cachedETag;
-  }
-
   try {
-    const response: AxiosResponse<T> = await axios.get<T>(url, { headers });
-    const newETag = response.headers.etag;
-
-    if (useRedisCache == "true") {
-      await redis.set(cacheKey, JSON.stringify(response.data), "EX", 300); // 5 min TTL
-      if (newETag) await redis.set(etagKey, newETag);
+    const result = await githubRequestBreaker.fire(url, token);
+    if (useRedisCache === "true") {
+      await redis.set(`github:${url}`, JSON.stringify(result), "EX", 300);
     }
-
-    return response.data;
-  } catch (error) {
-    const err = error as APIError;
-    if (err.response?.status === 304 && useRedisCache) {
-      const fallback = await redis.get(cacheKey);
-      if (fallback) return JSON.parse(fallback) as T;
-    }
-    throw err;
+    return result;
+  } catch (err) {
+    const error = err as APIError;
+    logger.error("GitHub API request failed after retries:", error.message);
+    throw error;
   }
 };
