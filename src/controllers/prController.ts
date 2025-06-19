@@ -329,3 +329,4 @@ export const compareDevelopersHandler = async (
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: err.message });
   }
 };
+ 
