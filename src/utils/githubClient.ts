@@ -1,6 +1,7 @@
 // external dependencies
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import "dotenv/config";
+import { config } from './config.js';
 
 // internal dependencies
 import redis from "../utils/redis.js";
@@ -9,6 +10,8 @@ import { APIError } from "../common/types.js";
 
 const useRedisCache = process.env.USE_REDIS_CACHE;
 console.log("2. use redis cache", useRedisCache);
+console.log("2. Connecting to Redis:", process.env.REDIS_URL);
+console.log("2. config redis url", config.redisUrl);
 
 /**
  * Dynamically imports and creates an authenticated GitHub Octokit client

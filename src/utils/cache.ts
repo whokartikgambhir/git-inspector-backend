@@ -1,9 +1,12 @@
 // internal dependencies
 import redis from "./redis.js";
 import "dotenv/config";
+import { config } from './config.js';
 
 const useRedisCache = process.env.USE_REDIS_CACHE;
 console.log("1. use redis cache", useRedisCache);
+console.log("1. Connecting to Redis:", process.env.REDIS_URL);
+console.log("1. config redis url", config.redisUrl);
 
 /**
  * Sets a value in Redis with TTL (in seconds)
