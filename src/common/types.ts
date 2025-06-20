@@ -1,6 +1,6 @@
 // external dependencies
 import { Request } from "express";
-import { IncomingHttpHeaders } from 'http';
+import { IncomingHttpHeaders } from "http";
 
 // interface for standardized API error objects
 export interface APIError extends Error {
@@ -12,7 +12,7 @@ export interface APIError extends Error {
   };
   response?: {
     status: number;
-  }
+  };
 }
 
 // interface for authenticated requests
@@ -81,13 +81,13 @@ export interface LongestPR {
 }
 
 export interface DeveloperPRStats {
-  username: string;
+  developer: string;
   totalPRs: number;
   openPRs: number;
   closedPRs: number;
   mergedPRs: number;
-  avgMergeTime: string | null;
-  longestOpenPR: LongestPR | null;
+  averageMergeTime: string | null;
+  longestRunningOpenPRs: LongestPR | null;
   score: number;
   grade: string;
   successRate: string;
