@@ -3,7 +3,6 @@ import express, { Router } from "express";
 
 // internal dependencies
 import { API_ENDPOINTS } from "../common/constants.js";
-import { checkUserExists } from "../middlewares/validateUser.js";
 import {
   getOpenPRsController,
   getPRTimingMetricsController,
@@ -19,7 +18,6 @@ const router: Router = express.Router();
 router.get(
   API_ENDPOINTS.PRS.OPEN,
   validateRequest(GetPrsDto),
-  checkUserExists,
   getOpenPRsController
 );
 
@@ -28,7 +26,6 @@ router.get(
 router.get(
   API_ENDPOINTS.PRS.METRICS,
   validateRequest(GetMetricsDto),
-  checkUserExists,
   getPRTimingMetricsController
 );
 
