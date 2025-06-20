@@ -4,7 +4,6 @@ import express, { Router } from "express";
 // internal dependencies
 import { API_ENDPOINTS } from "../common/constants.js";
 import { checkUserExists } from "../middlewares/validateUser.js";
-import { authenticateWithPAT } from "../middlewares/authMiddleware.js";
 import {
   getOpenPRsController,
   getPRTimingMetricsController,
@@ -19,7 +18,6 @@ const router: Router = express.Router();
 // this route provides open pull requests for a developer, optionally filtered by repository
 router.get(
   API_ENDPOINTS.PRS.OPEN,
-  authenticateWithPAT,
   validateRequest(GetPrsDto),
   checkUserExists,
   getOpenPRsController
@@ -29,7 +27,6 @@ router.get(
 // this route provides PR timing metrics for a developer
 router.get(
   API_ENDPOINTS.PRS.METRICS,
-  authenticateWithPAT,
   validateRequest(GetMetricsDto),
   checkUserExists,
   getPRTimingMetricsController
@@ -38,7 +35,6 @@ router.get(
 // GET route for comparing developer PR metrics
 router.get(
   API_ENDPOINTS.PRS.COMPARE,
-  authenticateWithPAT,
   compareDevelopersHandler
 );
 

@@ -58,7 +58,6 @@ export const DEFAULT_PORT = 3000;
 export const API_ENDPOINTS = Object.freeze({
   HEALTH_CHECK: "/health",
   API: "/api",
-  AUTH: "/auth",
   PRS: Object.freeze({
     OPEN: "/prs/:developer/open",
     METRICS: "/prs/metrics/:developer",

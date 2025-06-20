@@ -12,7 +12,6 @@ import { connect } from "./utils/db.js";
 import { config } from "./utils/config.js";
 import prRoutes from "./routes/prRoutes.js";
 import devRoutes from "./routes/devRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import { apiRateLimiter } from "./utils/rateLimiter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
@@ -42,7 +41,6 @@ function initRoutes(app: Application): void {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   // Register API routes
-  app.use(API_ENDPOINTS.API, authRoutes);
   app.use(API_ENDPOINTS.API, userRoutes);
   app.use(API_ENDPOINTS.API, prRoutes);
   app.use(API_ENDPOINTS.API, devRoutes);

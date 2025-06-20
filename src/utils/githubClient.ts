@@ -71,17 +71,6 @@ githubRequestBreaker.on("halfOpen", () => logger.info("GitHub circuit breaker: H
 githubRequestBreaker.on("close", () => logger.info("GitHub circuit breaker: CLOSED"));
 
 /**
- * Dynamically imports and creates an authenticated GitHub Octokit client
- *
- * @param pat - GitHub Personal Access Token
- * @returns Promise resolving to Octokit instance
- */
-export const createOctokitClient = async (pat: string) => {
-  const { Octokit } = await import("@octokit/rest");
-  return new Octokit({ auth: pat });
-};
-
-/**
  * Creates an Axios instance configured for GitHub API requests
  * 
  * @param token - GitHub Personal Access Token (PAT) for authentication
